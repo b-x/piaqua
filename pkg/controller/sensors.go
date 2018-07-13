@@ -13,7 +13,7 @@ type sensors struct {
 	values []int32
 }
 
-const updateInterval = time.Second * 30
+const updateSensorsInterval = time.Second * 30
 
 func (s *sensors) init(hwConf *config.HardwareConf) {
 	s.ids = hwConf.Sensors
@@ -22,7 +22,7 @@ func (s *sensors) init(hwConf *config.HardwareConf) {
 
 func (s *sensors) loop(quit <-chan struct{}) {
 	s.readSensors() // immediate first read
-	ticker := time.Tick(updateInterval)
+	ticker := time.Tick(updateSensorsInterval)
 	for {
 		select {
 		case <-quit:

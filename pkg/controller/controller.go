@@ -12,6 +12,7 @@ type Controller struct {
 	stop    chan struct{}
 	allDone sync.WaitGroup
 	sensors sensors
+	pins    pins
 }
 
 // NewController creates and runs a controller
@@ -25,11 +26,23 @@ func NewController(configDir string) (*Controller, error) {
 	c.stop = make(chan struct{})
 	c.sensors.init(&c.hwConf)
 
+	err = c.pins.init(&c.hwConf)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't init pins: %s", err.Error())
+	}
+
 	go func() {
 		c.allDone.Add(1)
 		defer c.allDone.Done()
 
 		c.sensors.loop(c.stop)
+	}()
+
+	go func() {
+		c.allDone.Add(1)
+		defer c.allDone.Done()
+
+		c.pins.loop(c.stop)
 	}()
 
 	return c, nil
@@ -39,4 +52,6 @@ func NewController(configDir string) (*Controller, error) {
 func (c *Controller) Stop() {
 	close(c.stop)
 	c.allDone.Wait()
+
+	c.pins.cleanup()
 }

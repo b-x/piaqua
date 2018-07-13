@@ -4,8 +4,11 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"piaqua/pkg/controller"
 	"syscall"
 )
+
+const configDir = "."
 
 func main() {
 	quit := make(chan os.Signal, 1)
@@ -18,6 +21,13 @@ func main() {
 	}()
 
 	log.Println("Controller is starting")
+	c, err := controller.NewController(configDir)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println("Controller started")
 	<-done
+	log.Println("Controller is stopping")
+	c.Stop()
 	log.Println("Controller stopped")
 }

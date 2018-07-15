@@ -2,7 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"piaqua/pkg/config"
+	"piaqua/pkg/hal"
 	"sync"
 )
 
@@ -10,9 +12,10 @@ import (
 type Controller struct {
 	hwConf  config.HardwareConf
 	stop    chan struct{}
+	events  chan hal.Event
 	allDone sync.WaitGroup
-	sensors sensors
-	pins    pins
+	sensors hal.Sensors
+	pins    hal.Pins
 }
 
 // NewController creates and runs a controller
@@ -24,25 +27,28 @@ func NewController(configDir string) (*Controller, error) {
 	}
 
 	c.stop = make(chan struct{})
-	c.sensors.init(&c.hwConf)
+	c.events = make(chan hal.Event, 16)
+	c.sensors.Init(&c.hwConf)
 
-	err = c.pins.init(&c.hwConf)
+	err = c.pins.Init(&c.hwConf)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't init pins: %s", err.Error())
 	}
 
+	eventSources := []hal.EventSource{&c.sensors, &c.pins}
+
+	c.allDone.Add(len(eventSources) + 1)
+
+	for _, source := range eventSources {
+		go func(es hal.EventSource) {
+			defer c.allDone.Done()
+			es.Loop(c.stop, c.events)
+		}(source)
+	}
+
 	go func() {
-		c.allDone.Add(1)
 		defer c.allDone.Done()
-
-		c.sensors.loop(c.stop)
-	}()
-
-	go func() {
-		c.allDone.Add(1)
-		defer c.allDone.Done()
-
-		c.pins.loop(c.stop)
+		c.processEvents(c.stop, c.events)
 	}()
 
 	return c, nil
@@ -53,5 +59,23 @@ func (c *Controller) Stop() {
 	close(c.stop)
 	c.allDone.Wait()
 
-	c.pins.cleanup()
+	c.pins.Cleanup()
+}
+
+func (c *Controller) processEvents(quit <-chan struct{}, events <-chan hal.Event) {
+	for {
+		select {
+		case <-quit:
+			return
+		case event := <-events:
+			switch e := event.(type) {
+			case hal.ButtonPressed:
+				log.Printf("Button %d pressed\n", e.ID)
+			case hal.TemperatureRead:
+				log.Printf("Sensor %d temp: %2.1f\n", e.ID, float32(e.Temp/100)/10)
+			case hal.TemperatureError:
+				log.Printf("Sensor %d error: %s\n", e.ID, e.Error)
+			}
+		}
+	}
 }

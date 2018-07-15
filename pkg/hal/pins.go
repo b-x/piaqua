@@ -1,14 +1,13 @@
-package controller
+package hal
 
 import (
-	"log"
 	"piaqua/pkg/config"
 	"time"
 
 	"github.com/stianeikeland/go-rpio"
 )
 
-type pins struct {
+type Pins struct {
 	buttons []rpio.Pin
 	relays  []rpio.Pin
 
@@ -17,7 +16,7 @@ type pins struct {
 
 const updateButtonsInterval = time.Millisecond * 100
 
-func (p *pins) init(hwConf *config.HardwareConf) error {
+func (p *Pins) Init(hwConf *config.HardwareConf) error {
 	err := rpio.Open()
 	if err != nil {
 		return err
@@ -47,7 +46,7 @@ func (p *pins) init(hwConf *config.HardwareConf) error {
 	return nil
 }
 
-func (p *pins) cleanup() {
+func (p *Pins) Cleanup() {
 	for _, pin := range p.buttons {
 		pin.PullOff()
 	}
@@ -57,19 +56,19 @@ func (p *pins) cleanup() {
 	rpio.Close()
 }
 
-func (p *pins) loop(quit <-chan struct{}) {
+func (p *Pins) Loop(quit <-chan struct{}, events chan<- Event) {
 	ticker := time.Tick(updateButtonsInterval)
 	for {
 		select {
 		case <-quit:
 			return
 		case <-ticker:
-			p.updateButtonsState()
+			p.updateButtonsState(events)
 		}
 	}
 }
 
-func (p *pins) updateButtonsState() {
+func (p *Pins) updateButtonsState(events chan<- Event) {
 	for i, pin := range p.buttons {
 		// EdgeDetected() doesn't work...
 		state := pin.Read()
@@ -78,8 +77,7 @@ func (p *pins) updateButtonsState() {
 		}
 		p.buttonsStates[i] = state
 		if state == rpio.Low {
-			//generate event
-			log.Printf("button %d: %d\n", i, state)
+			events <- ButtonPressed{i}
 		}
 
 	}

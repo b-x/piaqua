@@ -79,6 +79,13 @@ func (p *Pins) updateButtonsState(events chan<- Event) {
 		if state == rpio.Low {
 			events <- ButtonPressed{i}
 		}
-
 	}
+}
+
+func (p *Pins) SetRelay(id int, on bool) {
+	state := rpio.Low
+	if on {
+		state = rpio.High
+	}
+	p.relays[id].Write(state)
 }

@@ -4,7 +4,8 @@ sensors:
   - 28-04170190a2ff
 
 buttons: [10, 9, 11]
-relays: [15, 18, 23, 24, 25, 8, 7, 12]
+# unused relays: [12, 7]
+relays: [8, 25, 24, 23, 18, 15]
 
 
 #            Raspberry Pi (2, 3, Zero)

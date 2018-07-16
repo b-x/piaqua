@@ -17,5 +17,5 @@ func ExampleHardwareConf_Read() {
 	// Output:
 	// 2
 	// 3
-	// 8
+	// 6
 }

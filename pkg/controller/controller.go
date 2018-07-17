@@ -11,6 +11,7 @@ import (
 // Controller aquarium controller
 type Controller struct {
 	hwConf  config.HardwareConf
+	conf    config.ControllerConf
 	stop    chan struct{}
 	events  chan hal.Event
 	allDone sync.WaitGroup
@@ -25,6 +26,13 @@ func NewController(configDir string) (*Controller, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read hw config from %s: %s", configDir, err.Error())
 	}
+
+	err = c.conf.Read(configDir)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't read config from %s: %s", configDir, err.Error())
+	}
+
+	c.conf.Validate(&c.hwConf)
 
 	c.stop = make(chan struct{})
 	c.events = make(chan hal.Event, 16)

@@ -5,12 +5,17 @@ import (
 	"os"
 	"os/signal"
 	"piaqua/pkg/controller"
+	"piaqua/pkg/singleinstance"
 	"syscall"
 )
 
 const configDir = "."
 
 func main() {
+	if !singleinstance.Lock("piaqua") {
+		log.Fatalln("Another instance of a program is already running")
+	}
+
 	quit := make(chan os.Signal, 1)
 	done := make(chan struct{})
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

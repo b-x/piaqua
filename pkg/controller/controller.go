@@ -10,18 +10,22 @@ import (
 
 // Controller aquarium controller
 type Controller struct {
-	hwConf  config.HardwareConf
-	conf    config.ControllerConf
-	stop    chan struct{}
-	events  chan hal.Event
-	allDone sync.WaitGroup
-	sensors hal.Sensors
-	pins    hal.Pins
+	configDir string
+	hwConf    config.HardwareConf
+	conf      config.ControllerConf
+	stop      chan struct{}
+	events    chan hal.Event
+	allDone   sync.WaitGroup
+	sensors   hal.Sensors
+	pins      hal.Pins
+	state     ControllerState
+	lastID    int
+	mutex     sync.Mutex
 }
 
 // NewController creates and runs a controller
 func NewController(configDir string) (*Controller, error) {
-	c := &Controller{}
+	c := &Controller{configDir: configDir}
 	err := c.hwConf.Read(configDir)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read hw config from %s: %s", configDir, err.Error())
@@ -42,6 +46,8 @@ func NewController(configDir string) (*Controller, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't init pins: %s", err.Error())
 	}
+
+	c.init()
 
 	eventSources := []hal.EventSource{&c.sensors, &c.pins}
 
@@ -68,6 +74,32 @@ func (c *Controller) Stop() {
 	c.allDone.Wait()
 
 	c.pins.Cleanup()
+}
+
+func (c *Controller) init() {
+	for i := range c.conf.Relays {
+		for j := range c.conf.Relays[i].Tasks {
+			if j > c.lastID {
+				c.lastID = j
+			}
+		}
+	}
+	for i := range c.conf.Actions {
+		if i > c.lastID {
+			c.lastID = i
+		}
+	}
+}
+
+func (c *Controller) newID() int {
+	c.lastID++
+	return c.lastID
+}
+
+func (c *Controller) saveConfig() {
+	if err := c.conf.Write(c.configDir); err != nil {
+		log.Println("couldn't save config:", err)
+	}
 }
 
 func (c *Controller) processEvents(quit <-chan struct{}, events <-chan hal.Event) {

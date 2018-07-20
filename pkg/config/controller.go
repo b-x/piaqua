@@ -8,6 +8,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ControllerConf controller config
+type ControllerConf struct {
+	Sensors []Sensor
+	Relays  []Relay
+	Actions map[int]Action
+}
+
 // Sensor config
 type Sensor struct {
 	Name string
@@ -15,31 +22,23 @@ type Sensor struct {
 
 // Relay config
 type Relay struct {
-	Name string
+	Name  string
+	Tasks map[int]RelayTask
 }
 
-// Action config
-type Action struct {
-	Name     string
-	Relay    int
-	Button   int
-	Duration time.Duration
-}
-
-// Task config
-type Task struct {
-	Relay    int
+// RelayTask config
+type RelayTask struct {
 	Start    time.Duration
 	Stop     time.Duration
 	Weekdays int
 }
 
-// ControllerConf controller config
-type ControllerConf struct {
-	Sensors []Sensor
-	Relays  []Relay
-	Actions []Action
-	Tasks   []Task
+// Action config
+type Action struct {
+	Name     string
+	Button   int
+	Relay    int
+	Duration time.Duration
 }
 
 const controllerConfigFilename = "/controller.yml"

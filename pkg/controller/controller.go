@@ -36,7 +36,10 @@ func NewController(configDir string) (*Controller, error) {
 		return nil, fmt.Errorf("Couldn't read config from %s: %s", configDir, err.Error())
 	}
 
-	c.conf.Validate(&c.hwConf)
+	err = c.conf.Validate(&c.hwConf)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid config %s: %s", configDir, err.Error())
+	}
 
 	c.stop = make(chan struct{})
 	c.events = make(chan hal.Event, 16)

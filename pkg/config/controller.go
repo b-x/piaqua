@@ -62,11 +62,32 @@ func (conf *ControllerConf) Write(dir string) error {
 	return ioutil.WriteFile(dir+controllerConfigFilename, content, 0644)
 }
 
-func (conf *ControllerConf) Validate(hwConf *HardwareConf) {
+func (conf *ControllerConf) Validate(hwConf *HardwareConf) error {
 	if slen := len(hwConf.Sensors); slen != len(conf.Sensors) {
 		conf.Sensors = make([]Sensor, slen)
 	}
 	if rlen := len(hwConf.Relays); rlen != len(conf.Relays) {
 		conf.Relays = make([]Relay, rlen)
 	}
+
+	// TODO validate tasks and actions
+	return nil
+}
+
+func isValidDuration(duration time.Duration) bool {
+	return duration > 0 && duration < time.Hour*24
+}
+
+func isValidWeekdays(weekdays int) bool {
+	return weekdays > 0 && weekdays < (1<<7)
+}
+
+func (t *RelayTask) IsValid() bool {
+	return isValidDuration(t.Start) && isValidDuration(t.Stop) && isValidWeekdays(t.Weekdays)
+}
+
+func (a *Action) IsValid(hwConf *HardwareConf) bool {
+	return a.Duration > 0 &&
+		a.Relay >= 0 && a.Relay < len(hwConf.Relays) &&
+		a.Button >= 0 && a.Button < len(hwConf.Buttons)
 }

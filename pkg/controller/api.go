@@ -2,7 +2,7 @@ package controller
 
 import (
 	"errors"
-	"piaqua/pkg/config"
+	"piaqua/pkg/model"
 	"time"
 )
 
@@ -41,7 +41,7 @@ func (c *Controller) SetRelayName(id int, name string) error {
 	return nil
 }
 
-func (c *Controller) AddRelayTask(relayID int, task *config.RelayTask) (int, error) {
+func (c *Controller) AddRelayTask(relayID int, task *model.RelayTask) (int, error) {
 	if !task.IsValid() {
 		return 0, errArg
 	}
@@ -60,7 +60,7 @@ func (c *Controller) AddRelayTask(relayID int, task *config.RelayTask) (int, err
 	return id, nil
 }
 
-func (c *Controller) UpdateRelayTask(relayID int, taskID int, task *config.RelayTask) error {
+func (c *Controller) UpdateRelayTask(relayID int, taskID int, task *model.RelayTask) error {
 	if !task.IsValid() {
 		return errArg
 	}
@@ -101,11 +101,11 @@ func (c *Controller) RemoveRelayTask(relayID int, taskID int) error {
 	return nil
 }
 
-func (c *Controller) AddAction(action *config.Action) (int, error) {
+func (c *Controller) AddAction(action *model.Action) (int, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if !action.IsValid(&c.hwConf) {
+	if !action.IsValid(len(c.hwConf.Relays), len(c.hwConf.Buttons)) {
 		return 0, errArg
 	}
 
@@ -115,11 +115,11 @@ func (c *Controller) AddAction(action *config.Action) (int, error) {
 	return id, nil
 }
 
-func (c *Controller) UpdateAction(id int, action *config.Action) error {
+func (c *Controller) UpdateAction(id int, action *model.Action) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if !action.IsValid(&c.hwConf) {
+	if !action.IsValid(len(c.hwConf.Relays), len(c.hwConf.Buttons)) {
 		return errArg
 	}
 

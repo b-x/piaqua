@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"log"
+	"os"
 	"piaqua/pkg/config"
 	"piaqua/pkg/hal"
 	"sync"
@@ -32,11 +33,18 @@ func NewController(configDir string) (*Controller, error) {
 	}
 
 	err = c.conf.Read(configDir)
+	if os.IsNotExist(err) {
+		c.conf.Init(&c.hwConf)
+		err = c.conf.Write(configDir)
+		if err != nil {
+			return nil, fmt.Errorf("Couldn't write config to %s: %s", configDir, err.Error())
+		}
+		err = c.conf.Read(configDir)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read config from %s: %s", configDir, err.Error())
 	}
-
-	err = c.conf.Validate(&c.hwConf)
+	err = c.conf.CheckValid(&c.hwConf)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid config %s: %s", configDir, err.Error())
 	}

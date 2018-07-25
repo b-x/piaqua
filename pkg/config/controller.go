@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
-	"os"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -12,7 +12,7 @@ import (
 type ControllerConf struct {
 	Sensors []Sensor
 	Relays  []Relay
-	Actions map[int]Action
+	Actions map[int]*Action
 }
 
 // Sensor config
@@ -23,7 +23,7 @@ type Sensor struct {
 // Relay config
 type Relay struct {
 	Name  string
-	Tasks map[int]RelayTask
+	Tasks map[int]*RelayTask
 }
 
 // RelayTask config
@@ -39,15 +39,13 @@ type Action struct {
 	Button   int
 	Relay    int
 	Duration time.Duration
+	Start    time.Time
 }
 
 const controllerConfigFilename = "/controller.yml"
 
 func (conf *ControllerConf) Read(dir string) error {
 	content, err := ioutil.ReadFile(dir + controllerConfigFilename)
-	if os.IsNotExist(err) {
-		return nil
-	}
 	if err != nil {
 		return err
 	}
@@ -62,15 +60,31 @@ func (conf *ControllerConf) Write(dir string) error {
 	return ioutil.WriteFile(dir+controllerConfigFilename, content, 0644)
 }
 
-func (conf *ControllerConf) Validate(hwConf *HardwareConf) error {
+func (conf *ControllerConf) Init(hwConf *HardwareConf) {
+	conf.Sensors = make([]Sensor, len(hwConf.Sensors))
+	conf.Relays = make([]Relay, len(hwConf.Relays))
+}
+
+func (conf *ControllerConf) CheckValid(hwConf *HardwareConf) error {
 	if slen := len(hwConf.Sensors); slen != len(conf.Sensors) {
-		conf.Sensors = make([]Sensor, slen)
+		return fmt.Errorf("Invalid number of sensors")
 	}
 	if rlen := len(hwConf.Relays); rlen != len(conf.Relays) {
-		conf.Relays = make([]Relay, rlen)
+		return fmt.Errorf("Invalid number of relays")
 	}
 
-	// TODO validate tasks and actions
+	for i := range conf.Relays {
+		for j, task := range conf.Relays[i].Tasks {
+			if !task.IsValid() {
+				return fmt.Errorf("Invalid relay %d task %d", i, j)
+			}
+		}
+	}
+	for i, action := range conf.Actions {
+		if !action.IsValid(hwConf) {
+			return fmt.Errorf("Invalid action %d", i)
+		}
+	}
 	return nil
 }
 
@@ -89,5 +103,9 @@ func (t *RelayTask) IsValid() bool {
 func (a *Action) IsValid(hwConf *HardwareConf) bool {
 	return a.Duration > 0 &&
 		a.Relay >= 0 && a.Relay < len(hwConf.Relays) &&
-		a.Button >= 0 && a.Button < len(hwConf.Buttons)
+		a.Button >= -1 && a.Button < len(hwConf.Buttons)
+}
+
+func (a *Action) IsActive(t time.Time) bool {
+	return a.Start.Add(a.Duration).After(t)
 }

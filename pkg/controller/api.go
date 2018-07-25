@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"piaqua/pkg/config"
+	"time"
 )
 
 var errID = errors.New("id out of bounds")
@@ -40,7 +41,7 @@ func (c *Controller) SetRelayName(id int, name string) error {
 	return nil
 }
 
-func (c *Controller) AddRelayTask(relayID int, task config.RelayTask) (int, error) {
+func (c *Controller) AddRelayTask(relayID int, task *config.RelayTask) (int, error) {
 	if !task.IsValid() {
 		return 0, errArg
 	}
@@ -59,7 +60,7 @@ func (c *Controller) AddRelayTask(relayID int, task config.RelayTask) (int, erro
 	return id, nil
 }
 
-func (c *Controller) UpdateRelayTask(relayID int, taskID int, task config.RelayTask) error {
+func (c *Controller) UpdateRelayTask(relayID int, taskID int, task *config.RelayTask) error {
 	if !task.IsValid() {
 		return errArg
 	}
@@ -100,7 +101,7 @@ func (c *Controller) RemoveRelayTask(relayID int, taskID int) error {
 	return nil
 }
 
-func (c *Controller) AddAction(action config.Action) (int, error) {
+func (c *Controller) AddAction(action *config.Action) (int, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -114,7 +115,7 @@ func (c *Controller) AddAction(action config.Action) (int, error) {
 	return id, nil
 }
 
-func (c *Controller) UpdateAction(id int, action config.Action) error {
+func (c *Controller) UpdateAction(id int, action *config.Action) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -145,7 +146,22 @@ func (c *Controller) RemoveAction(id int) error {
 	return nil
 }
 
-func (c *Controller) MakeAction(id int) error {
-	//TODO
+func (c *Controller) ToggleAction(id int) error {
+	now := time.Now()
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	action, found := c.conf.Actions[id]
+	if !found {
+		return errID
+	}
+
+	if action.IsActive(now) {
+		action.Start = time.Time{}
+	} else {
+		action.Start = now
+	}
+	c.saveConfig()
 	return nil
 }

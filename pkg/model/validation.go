@@ -8,12 +8,12 @@ func isValidDuration24h(duration time.Duration) bool {
 	return duration > 0 && duration < time.Hour*24
 }
 
-func isValidWeekdays(weekdays int) bool {
-	return weekdays > 0 && weekdays < (1<<7)
+func (wd Weekdays) IsValid() bool {
+	return wd >= toWeekdays(time.Sunday) && wd <= toWeekdays(time.Saturday)
 }
 
 func (t *RelayTask) IsValid() bool {
-	return isValidDuration24h(t.Start) && isValidDuration24h(t.Stop) && isValidWeekdays(t.Weekdays)
+	return isValidDuration24h(t.Start) && isValidDuration24h(t.Stop) && t.Weekdays.IsValid()
 }
 
 func (a *Action) IsValid(numRelays, numButtons int) bool {

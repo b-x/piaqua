@@ -20,7 +20,7 @@ type Relay struct {
 type RelayTask struct {
 	Start    time.Duration
 	Stop     time.Duration
-	Weekdays int
+	Weekdays Weekdays
 }
 
 type Action struct {
@@ -30,3 +30,5 @@ type Action struct {
 	Duration time.Duration
 	Start    time.Time
 }
+
+type Weekdays int

@@ -100,6 +100,19 @@ func (c *Controller) init() {
 			c.lastID = i
 		}
 	}
+
+	c.state.Sensors = make([]SensorState, len(c.conf.Sensors))
+	c.state.Relays = make([]RelayState, len(c.conf.Relays))
+
+	for i := range c.conf.Sensors {
+		c.state.Sensors[i].ID = i
+		c.state.Sensors[i].Name = c.conf.Sensors[i].Name
+	}
+
+	for i := range c.conf.Relays {
+		c.state.Relays[i].ID = i
+		c.state.Relays[i].Name = c.conf.Relays[i].Name
+	}
 }
 
 func (c *Controller) newID() int {
@@ -121,12 +134,34 @@ func (c *Controller) processEvents(quit <-chan struct{}, events <-chan hal.Event
 		case event := <-events:
 			switch e := event.(type) {
 			case hal.ButtonPressed:
-				log.Printf("Button %d pressed\n", e.ID)
+				c.onButtonPressed(e)
 			case hal.TemperatureRead:
-				log.Printf("Sensor %d temp: %2.1f\n", e.ID, float32(e.Temp/100)/10)
+				c.onTempRead(e)
 			case hal.TemperatureError:
-				log.Printf("Sensor %d error: %s\n", e.ID, e.Error)
+				c.onTempError(e)
 			}
 		}
 	}
+}
+
+func (c *Controller) onTempRead(e hal.TemperatureRead) {
+	value := float32(e.Temp) / 1000
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.state.Sensors[e.ID].Value = &value
+}
+
+func (c *Controller) onTempError(e hal.TemperatureError) {
+	log.Printf("Sensor %d error: %s\n", e.ID, e.Error)
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.state.Sensors[e.ID].Value = nil
+}
+
+func (c *Controller) onButtonPressed(e hal.ButtonPressed) {
+	log.Printf("Button %d pressed\n", e.ID)
 }

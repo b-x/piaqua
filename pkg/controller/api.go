@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"errors"
 	"piaqua/pkg/model"
 	"time"
@@ -8,6 +9,14 @@ import (
 
 var errID = errors.New("id out of bounds")
 var errArg = errors.New("invalid argument")
+
+func (c *Controller) GetControllerState() ([]byte, error) {
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return json.Marshal(c.state)
+}
 
 func (c *Controller) SetSensorName(id int, name string) error {
 	c.mutex.Lock()
@@ -21,6 +30,7 @@ func (c *Controller) SetSensorName(id int, name string) error {
 		return nil
 	}
 	sensor.Name = name
+	c.state.Sensors[id].Name = name
 	c.saveConfig()
 	return nil
 }
@@ -37,6 +47,7 @@ func (c *Controller) SetRelayName(id int, name string) error {
 		return nil
 	}
 	relay.Name = name
+	c.state.Relays[id].Name = name
 	c.saveConfig()
 	return nil
 }

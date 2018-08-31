@@ -7,9 +7,9 @@ type ControllerState struct {
 }
 
 type SensorState struct {
-	ID    int     `json:"id"`
-	Name  string  `json:"name"`
-	Value float32 `json:"value"`
+	ID    int      `json:"id"`
+	Name  string   `json:"name"`
+	Value *float32 `json:"value"`
 }
 
 type RelayState struct {

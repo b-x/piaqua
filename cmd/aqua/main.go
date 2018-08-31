@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"piaqua/pkg/controller"
+	"piaqua/pkg/server"
 	"piaqua/pkg/singleinstance"
 	"syscall"
 )
@@ -20,8 +21,11 @@ func main() {
 	done := make(chan struct{})
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
+	var srv server.Server
+
 	go func() {
 		<-quit
+		srv.Stop()
 		close(done)
 	}()
 
@@ -31,6 +35,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	log.Println("Controller started")
+	srv.Start(c)
 	<-done
 	log.Println("Controller is stopping")
 	c.Stop()

@@ -19,8 +19,12 @@
 			<tr class="w3-light-grey">
 				<th>Akcja</th>
 			</tr>
-			<tr ng-repeat="x in aq_state.actions">
-				<!-- TODO -->
+			<tr ng-repeat="(k, x) in aq_state.actions">
+				<td>
+					<form ng-submit="setActionName(k, x.name)">
+						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
+					</form>
+				</td>
 			</tr>
 		</table>
 		<br>
@@ -31,7 +35,7 @@
 			</tr>
 			<tr ng-repeat="x in aq_state.sensors">
 				<td>
-					<form ng-submit="setSensorName(x)">
+					<form ng-submit="setSensorName($index, x.name)">
 						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
 					</form>
 				</td>
@@ -48,7 +52,7 @@
 			</tr>
 			<tr ng-repeat="x in aq_state.relays">
 				<td>
-					<form ng-submit="setRelayName(x)">
+					<form ng-submit="setRelayName($index, x.name)">
 						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
 					</form>
 				</td>

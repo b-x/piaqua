@@ -2,6 +2,12 @@ package model
 
 import "time"
 
+type System struct {
+	Sensors Sensors `json:"sensors"`
+	Relays  Relays  `json:"relays"`
+	Actions Actions `json:"actions"`
+}
+
 type Sensors []Sensor
 
 type Relays []Relay
@@ -9,26 +15,29 @@ type Relays []Relay
 type Actions map[int]*Action
 
 type Sensor struct {
-	Name string
+	Name  string   `json:"name"`
+	Value *float32 `json:"value" yaml:"-"`
 }
 
 type Relay struct {
-	Name  string
-	Tasks map[int]*RelayTask
+	Name  string             `json:"name"`
+	On    bool               `json:"on" yaml:"-"`
+	Tasks map[int]*RelayTask `json:"tasks"`
 }
 
 type RelayTask struct {
-	Start    time.Duration
-	Stop     time.Duration
-	Weekdays Weekdays
+	Start    time.Duration `json:"start"`
+	Stop     time.Duration `json:"stop"`
+	Weekdays Weekdays      `json:"weekdays"`
 }
 
 type Action struct {
-	Name     string
-	Button   int
-	Relay    int
-	Duration time.Duration
-	Start    time.Time
+	Name     string        `json:"name"`
+	On       bool          `json:"on" yaml:"-"`
+	Button   int           `json:"button"`
+	Relay    int           `json:"relay"`
+	Duration time.Duration `json:"duration"`
+	Start    time.Time     `json:"start"`
 }
 
 type Weekdays int

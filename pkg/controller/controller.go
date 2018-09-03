@@ -13,13 +13,12 @@ import (
 type Controller struct {
 	configDir string
 	hwConf    config.HardwareConf
-	conf      config.ControllerConf
+	state     config.ControllerConf
 	stop      chan struct{}
 	events    chan hal.Event
 	allDone   sync.WaitGroup
 	sensors   hal.Sensors
 	pins      hal.Pins
-	state     ControllerState
 	lastID    int
 	mutex     sync.Mutex
 }
@@ -32,19 +31,19 @@ func NewController(configDir string) (*Controller, error) {
 		return nil, fmt.Errorf("Couldn't read hw config from %s: %s", configDir, err.Error())
 	}
 
-	err = c.conf.Read(configDir)
+	err = c.state.Read(configDir)
 	if os.IsNotExist(err) {
-		c.conf.Init(&c.hwConf)
-		err = c.conf.Write(configDir)
+		c.state.Init(&c.hwConf)
+		err = c.state.Write(configDir)
 		if err != nil {
 			return nil, fmt.Errorf("Couldn't write config to %s: %s", configDir, err.Error())
 		}
-		err = c.conf.Read(configDir)
+		err = c.state.Read(configDir)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read config from %s: %s", configDir, err.Error())
 	}
-	err = c.conf.CheckValid(&c.hwConf)
+	err = c.state.CheckValid(&c.hwConf)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid config %s: %s", configDir, err.Error())
 	}
@@ -88,30 +87,17 @@ func (c *Controller) Stop() {
 }
 
 func (c *Controller) init() {
-	for i := range c.conf.Relays {
-		for j := range c.conf.Relays[i].Tasks {
+	for i := range c.state.Relays {
+		for j := range c.state.Relays[i].Tasks {
 			if j > c.lastID {
 				c.lastID = j
 			}
 		}
 	}
-	for i := range c.conf.Actions {
+	for i := range c.state.Actions {
 		if i > c.lastID {
 			c.lastID = i
 		}
-	}
-
-	c.state.Sensors = make([]SensorState, len(c.conf.Sensors))
-	c.state.Relays = make([]RelayState, len(c.conf.Relays))
-
-	for i := range c.conf.Sensors {
-		c.state.Sensors[i].ID = i
-		c.state.Sensors[i].Name = c.conf.Sensors[i].Name
-	}
-
-	for i := range c.conf.Relays {
-		c.state.Relays[i].ID = i
-		c.state.Relays[i].Name = c.conf.Relays[i].Name
 	}
 }
 
@@ -121,7 +107,7 @@ func (c *Controller) newID() int {
 }
 
 func (c *Controller) saveConfig() {
-	if err := c.conf.Write(c.configDir); err != nil {
+	if err := c.state.Write(c.configDir); err != nil {
 		log.Println("couldn't save config:", err)
 	}
 }

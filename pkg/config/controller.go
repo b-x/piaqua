@@ -9,11 +9,7 @@ import (
 )
 
 // ControllerConf controller config
-type ControllerConf struct {
-	Sensors model.Sensors
-	Relays  model.Relays
-	Actions model.Actions
-}
+type ControllerConf model.System
 
 const controllerConfigFilename = "/controller.yml"
 

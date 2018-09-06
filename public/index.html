@@ -4,7 +4,9 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Akwarium</title>
+	<link rel="icon" type="image/png" href="fish.png">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
 	<script src="aquarium.js"></script>
 </head>
@@ -12,53 +14,78 @@
 <body ng-app="aquarium">
 	<div ng-controller="state" class="w3-container" style="width:35em; margin:0 auto">
 		<div class="w3-container w3-light-gray w3-center w3-border">
-			<h3>Sterowanie akwarium</h3>
+			<h2>Sterowanie akwarium</h2>
 		</div>
-		<br>
-		<table class="w3-table w3-border w3-bordered">
-			<tr class="w3-light-grey">
-				<th>Akcja</th>
-			</tr>
-			<tr ng-repeat="(k, x) in aq_state.actions">
-				<td>
-					<form ng-submit="setActionName(k, x.name)">
-						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
-					</form>
-				</td>
-			</tr>
-		</table>
-		<br>
-		<table class="w3-table w3-border w3-bordered">
-			<tr class="w3-light-grey">
-				<th>Sensor</th>
-				<th>Temp.</th>
-			</tr>
-			<tr ng-repeat="x in aq_state.sensors">
-				<td>
-					<form ng-submit="setSensorName($index, x.name)">
-						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
-					</form>
-				</td>
-				<td>
-					{{ x.value | number: 1 }}
-				</td>
-			</tr>
-		</table>
-		<br>
-		<table class="w3-table w3-border w3-bordered">
-			<tr class="w3-light-grey">
-				<th>Włącznik</th>
-				<th>Stan</th>
-			</tr>
-			<tr ng-repeat="x in aq_state.relays">
-				<td>
-					<form ng-submit="setRelayName($index, x.name)">
-						<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
-					</form>
-				</td>
-				<td>{{ x.on }}</td>
-			</tr>
-		</table>
+
+		<div ng-if="aq_error">
+			<br>
+			<div class="w3-container w3-pale-red w3-center w3-border w3-border-red">
+				<h3>Błąd: {{aq_error}}</h3>
+			</div>
+		</div>
+
+		<div ng-if="aq_state">
+			<br>
+			<table class="actions w3-table w3-border w3-bordered">
+				<tr class="w3-light-grey">
+					<th colspan="2">Akcja</th>
+					<th>
+						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">add</i>
+					</th>
+				</tr>
+				<tr ng-repeat="(k, x) in aq_state.actions">
+					<td>
+						<form ng-submit="setActionName(k, x.name)">
+							<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
+						</form>
+					</td>
+					<td>
+						<i class="w3-btn w3-padding-small material-icons w3-text-amber" ng-if="x.on" onclick="alert('todo')">wb_sunny</i>
+						<i class="w3-btn w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" onclick="alert('todo')">wb_sunny</i>
+					</td>
+					<td>
+						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">edit</i>
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table class="sensors w3-table w3-border w3-bordered">
+				<tr class="w3-light-grey">
+					<th colspan="2">Sensor</th>
+				</tr>
+				<tr ng-repeat="x in aq_state.sensors">
+					<td>
+						<form ng-submit="setSensorName($index, x.name)">
+							<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
+						</form>
+					</td>
+					<td>
+						{{ x.value | number: 1 }} °C
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table class="relays w3-table w3-border w3-bordered">
+				<tr class="w3-light-grey">
+					<th colspan="3">Włącznik</th>
+				</tr>
+				<tr ng-repeat="x in aq_state.relays">
+					<td>
+						<form ng-submit="setRelayName($index, x.name)">
+							<input class="w3-input w3-border-0 w3-padding-small" type="text" placeholder="ustaw nazwę" ng-model="x.name">
+						</form>
+					</td>
+					<td>
+						<i class="w3-padding-small material-icons w3-text-amber" ng-if="x.on">wb_sunny</i>
+						<i class="w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
+					</td>
+					<td>
+						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">today</i>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 	</div>
 </body>
 

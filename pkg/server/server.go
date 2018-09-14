@@ -15,7 +15,7 @@ func (s *Server) Start(c *controller.Controller) error {
 	router := httprouter.New()
 	router.GET("/state", state(c))
 
-	s.srv = &http.Server{Addr: ":8080", Handler: router}
+	s.srv = &http.Server{Addr: "[::1]:8080", Handler: router}
 	err := s.srv.ListenAndServe()
 	return err
 }

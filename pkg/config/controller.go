@@ -32,6 +32,7 @@ func (conf *ControllerConf) Write(dir string) error {
 func (conf *ControllerConf) Init(hwConf *HardwareConf) {
 	conf.Sensors = make(model.Sensors, len(hwConf.Sensors))
 	conf.Relays = make(model.Relays, len(hwConf.Relays))
+	conf.Buttons = len(hwConf.Buttons)
 }
 
 func (conf *ControllerConf) CheckValid(hwConf *HardwareConf) error {
@@ -40,6 +41,9 @@ func (conf *ControllerConf) CheckValid(hwConf *HardwareConf) error {
 	}
 	if rlen := len(hwConf.Relays); rlen != len(conf.Relays) {
 		return fmt.Errorf("Invalid number of relays")
+	}
+	if len(hwConf.Buttons) != conf.Buttons {
+		return fmt.Errorf("Invalid number of buttons")
 	}
 
 	for i := range conf.Relays {

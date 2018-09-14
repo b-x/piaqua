@@ -6,6 +6,7 @@ type System struct {
 	Sensors Sensors `json:"sensors"`
 	Relays  Relays  `json:"relays"`
 	Actions Actions `json:"actions"`
+	Buttons int     `json:"buttons"`
 }
 
 type Sensors []Sensor
@@ -34,7 +35,7 @@ type RelayTask struct {
 type Action struct {
 	Name     string        `json:"name"`
 	On       bool          `json:"on" yaml:"-"`
-	Button   int           `json:"button"`
+	Button   *int          `json:"button"`
 	Relay    int           `json:"relay"`
 	Duration time.Duration `json:"duration"`
 	Start    time.Time     `json:"start"`

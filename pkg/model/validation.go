@@ -19,5 +19,5 @@ func (t *RelayTask) IsValid() bool {
 func (a *Action) IsValid(numRelays, numButtons int) bool {
 	return a.Duration > 0 &&
 		a.Relay >= 0 && a.Relay < numRelays &&
-		a.Button >= -1 && a.Button < numButtons
+		(a.Button == nil || *a.Button < numButtons)
 }

@@ -24,13 +24,52 @@
 			</div>
 		</div>
 
-		<div ng-if="aq_state">
+		<div ng-if="aq_state && aq_form == 'action'">
+			<br>
+			<form class="w3-container">
+				<h3>Nowa akcja</h3>
+				<p>
+					<label>Nazwa</label>
+					<input class="w3-input" type="text" ng-model="aq_edit_action.name">
+				</p>
+				<p>
+					<label>Włącznik</label>
+					<select class="w3-select" ng-model="aq_edit_action.relay" ng-options="idx*1 as relay for (idx, relay) in aq_edit_action_relays" required></select>
+				</p>
+				<p>
+					<label>Przycisk</label>
+					<select class="w3-select" ng-model="aq_edit_action.button" ng-options="idx*1 as name for (idx, name) in aq_edit_action_buttons">
+						<option value="">brak</option>
+					</select>
+				</p>
+				<p>
+					<label>Czas trwania</label>
+					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
+				</p>
+				<p>
+					<button class="w3-btn w3-light-gray" ng-click="updateAction(aq_edit_action_id, aq_edit_action)">Dodaj</button>
+					<button class="w3-btn w3-light-gray">Usuń</button>
+					<button class="w3-btn w3-light-gray" ng-click="showState()">Anuluj</button>
+				</p>
+			</form>
+		</div>
+
+		<div ng-if="aq_state && aq_form == 'tasks'">
+			<p>Harmonogram</p>
+			<form>
+				aaa <input><br> bbb <input><br>
+				<button class="w3-btn">dodaj</button>
+				<button class="w3-btn" ng-click="showState()">Anuluj</button>
+			</form>
+		</div>
+
+		<div ng-if="aq_state && aq_form == 'state' ">
 			<br>
 			<table class="actions w3-table w3-border w3-bordered">
 				<tr class="w3-light-grey">
 					<th colspan="2">Akcja</th>
 					<th>
-						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">add</i>
+						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(-1)">add</i>
 					</th>
 				</tr>
 				<tr ng-repeat="(k, x) in aq_state.actions">
@@ -40,11 +79,11 @@
 						</form>
 					</td>
 					<td>
-						<i class="w3-btn w3-padding-small material-icons w3-text-amber" ng-if="x.on" onclick="alert('todo')">wb_sunny</i>
-						<i class="w3-btn w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" onclick="alert('todo')">wb_sunny</i>
+						<i class="w3-btn w3-padding-small material-icons w3-text-amber" ng-if="x.on" ng-click="toggleAction(k)">wb_sunny</i>
+						<i class="w3-btn w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" ng-click="toggleAction(k)">wb_sunny</i>
 					</td>
 					<td>
-						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">edit</i>
+						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(k)">edit</i>
 					</td>
 				</tr>
 			</table>
@@ -60,7 +99,7 @@
 						</form>
 					</td>
 					<td>
-						{{ x.value | number: 1 }} °C
+						<span class="w3-right">{{ x.value | number: 1 }} °C</span>
 					</td>
 				</tr>
 			</table>
@@ -80,7 +119,7 @@
 						<i class="w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
 					</td>
 					<td>
-						<i class="w3-btn w3-padding-small material-icons" onclick="alert('todo')">today</i>
+						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelayTasks($index)">today</i>
 					</td>
 				</tr>
 			</table>

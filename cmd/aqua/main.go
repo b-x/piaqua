@@ -35,7 +35,10 @@ func main() {
 		log.Fatalln(err)
 	}
 	log.Println("Controller started")
-	srv.Start(c)
+	err = srv.Start(c)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	<-done
 	log.Println("Controller is stopping")
 	c.Stop()

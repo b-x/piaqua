@@ -12,8 +12,9 @@ app.directive('aqDuration', function () {
 				ngModel.$formatters.push(function (value) {
 					return new Date(value / 1000000);
 				});
-				ngModel.$options = ngModel.$options.createChild({
+				ngModel.$overrideModelOptions({
 					timezone: 'UTC',
+					timeSecondsFormat: 'ss',
 				});
 			}
 		}
@@ -55,18 +56,38 @@ app.controller('state', function ($scope, $http, $interval) {
 	}
 
 	$scope.updateAction = function (id, action) {
-		$http.put('api/action/' + id + '/', action).
+		$http.put('api/action/' + id, action).
 			then(function (response) {
+				$scope.showState()
+			})
+	}
+
+	$scope.addAction = function (action) {
+		$http.post('api/action', action).
+			then(function (response) {
+				$scope.showState()
+			})
+	}
+
+	$scope.removeAction = function (id) {
+		$http.delete('api/action/' + id).
+			then(function (response) {
+				$scope.showState()
 			})
 	}
 
 	$scope.showState = function () {
+		$scope.getState()
 		$scope.aq_form = 'state'
 	}
 
 	$scope.editAction = function (id) {
 		$scope.aq_edit_action_id = id
-		$scope.aq_edit_action = angular.copy($scope.aq_state.actions[id])
+		if (id >= 0) {
+			$scope.aq_edit_action = angular.copy($scope.aq_state.actions[id])
+		} else {
+			$scope.aq_edit_action = { duration: 0 }
+		}
 		$scope.aq_edit_action_relays = $scope.aq_state.relays.map(x => x.name)
 		$scope.aq_edit_action_buttons = Array.from(new Array($scope.aq_state.buttons), (x, i) => i + 1)
 		$scope.aq_form = 'action'
@@ -76,7 +97,6 @@ app.controller('state', function ($scope, $http, $interval) {
 		$scope.aq_form = 'tasks'
 	}
 
-	$scope.getState()
 	$scope.showState()
 	getPeriodically = $interval($scope.getState, 30000);
 });

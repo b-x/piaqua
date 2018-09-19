@@ -14,6 +14,10 @@ type Server struct {
 func (s *Server) Start(c *controller.Controller) error {
 	router := httprouter.New()
 	router.GET("/state", state(c))
+	router.POST("/action", addAction(c))
+	router.PUT("/action/:id", updateAction(c))
+	router.PUT("/action/:id/toggle", toggleAction(c))
+	router.DELETE("/action/:id", removeAction(c))
 
 	s.srv = &http.Server{Addr: "[::1]:8080", Handler: router}
 	err := s.srv.ListenAndServe()

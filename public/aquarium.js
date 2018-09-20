@@ -21,6 +21,27 @@ app.directive('aqDuration', function () {
 	};
 });
 
+app.filter('aqDuration', function ($filter) {
+	return function (value) {
+		return $filter('date')(value / 1000000, 'HH:mm:ss', 'UTC')
+	};
+});
+
+app.filter('aqWeekdays', function () {
+	return function (value) {
+		const order = [1, 2, 3, 4, 5, 6, 0];
+		const days = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
+
+		if (value == 127) {
+			return "codziennie";
+		}
+		return order
+			.filter(i => value & (1 << i))
+			.map(i => days[i])
+			.join(', ');
+	}
+});
+
 app.controller('state', function ($scope, $http, $interval) {
 	$scope.getState = function () {
 		$http.get('api/state').
@@ -93,7 +114,15 @@ app.controller('state', function ($scope, $http, $interval) {
 		$scope.aq_form = 'action'
 	}
 
+	$scope.editSensor = function (id) {
+		$scope.aq_edit_sensor_id = id
+		$scope.aq_edit_sensor_name = $scope.aq_state.sensors[id].name
+		$scope.aq_form = 'sensor'
+	}
+
 	$scope.editRelayTasks = function (id) {
+		$scope.aq_edit_task_id = id
+		$scope.aq_edit_relay_name = $scope.aq_state.relays[id].name
 		$scope.aq_form = 'tasks'
 	}
 

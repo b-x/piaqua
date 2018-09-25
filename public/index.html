@@ -7,17 +7,12 @@
 	<link rel="icon" type="image/png" href="fish.png">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>-->
-	<script src="https://code.angularjs.org/1.7.4/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
 	<script src="aquarium.js"></script>
 </head>
 
 <body ng-app="aquarium">
 	<div ng-controller="state" class="w3-container" style="width:35em; margin:0 auto">
-		<div class="w3-container w3-light-gray w3-center w3-border">
-			<h2>Sterowanie akwarium</h2>
-		</div>
-
 		<div ng-if="aq_error">
 			<br>
 			<div class="w3-container w3-pale-red w3-center w3-border w3-border-red">
@@ -26,10 +21,9 @@
 		</div>
 
 		<div ng-if="aq_state && aq_form == 'action'">
-			<br>
 			<h3 class="w3-center w3-border w3-light-grey" ng-if="aq_edit_action_id < 0">Nowa akcja</h3>
 			<h3 class="w3-center w3-border w3-light-grey" ng-if="aq_edit_action_id >= 0">Edycja akcji</h3>
-			<form class="w3-container">
+			<form class="w3-container w3-border" name="aq_form_action">
 				<p>
 					<label>Nazwa</label>
 					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_action.name" required>
@@ -49,11 +43,14 @@
 				</p>
 				<p>
 					<label>Czas trwania</label>
-					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
+					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" min="00:00:01" aq-duration
+					 required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0">Dodaj</button>
-					<button class="w3-btn w3-light-gray" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0">Zapisz</button>
+					<button class="w3-btn w3-light-gray" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0"
+					 ng-disabled="!aq_form_action.$valid">Dodaj</button>
+					<button class="w3-btn w3-light-gray" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0"
+					 ng-disabled="!aq_form_action.$valid">Zapisz</button>
 					<button class="w3-btn w3-light-gray" ng-click="removeAction(aq_edit_action_id)" ng-if="aq_edit_action_id >= 0">Usuń</button>
 					<button class="w3-btn w3-light-gray" ng-click="showState()">Anuluj</button>
 				</p>
@@ -61,32 +58,30 @@
 		</div>
 
 		<div ng-if="aq_state && aq_form == 'sensor'">
-			<br>
 			<h3 class="w3-center w3-border w3-light-grey">Sensor {{ aq_edit_sensor_id + 1 }}</h3>
-			<form class="w3-container">
+			<form class="w3-container w3-border" name="aq_form_sensor">
 				<p>
 					<label>Nazwa</label>
 					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_sensor_name" required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-disabled="aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
-					 ng-click="">Zapisz</button>
+					<button class="w3-btn w3-light-gray" ng-disabled="!aq_form_sensor.$valid || aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
+					 ng-click="setSensorName(aq_edit_sensor_id, aq_edit_sensor_name)">Zapisz</button>
 					<button class="w3-btn w3-light-gray" ng-click="showState()">Anuluj</button>
 				</p>
 			</form>
 		</div>
 
-		<div ng-if="aq_state && aq_form == 'tasks'">
-			<br>
-			<h3 class="w3-center w3-border w3-light-grey">Włącznik {{ aq_edit_task_id + 1 }}</h3>
-			<form class="w3-container">
+		<div ng-if="aq_state && aq_form == 'relay'">
+			<h3 class="w3-center w3-border w3-light-grey">Włącznik {{ aq_edit_relay_id + 1 }}</h3>
+			<form class="w3-container w3-border" name="aq_form_relay">
 				<p>
 					<label>Nazwa</label>
 					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_relay_name" required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-disabled="aq_edit_relay_name == aq_state.relays[aq_edit_task_id].name"
-					 ng-click="">Zapisz</button>
+					<button class="w3-btn w3-light-gray" ng-disabled="!aq_form_relay.$valid || aq_edit_relay_name == aq_state.relays[aq_edit_relay_id].name"
+					 ng-click="setRelayName(aq_edit_relay_id, aq_edit_relay_name)">Zapisz</button>
 				</p>
 			</form>
 			<br>
@@ -99,7 +94,7 @@
 						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="addTask(-1)">add</i>
 					</th>
 				</tr>
-				<tr ng-repeat="(k, x) in aq_state.relays[aq_edit_task_id].tasks">
+				<tr ng-repeat="(k, x) in aq_state.relays[aq_edit_relay_id].tasks">
 					<td>{{ x.start | aqDuration }}</td>
 					<td>{{ x.stop | aqDuration }}</td>
 					<td>{{ x.weekdays | aqWeekdays }}</td>
@@ -114,6 +109,7 @@
 		</div>
 
 		<div ng-if="aq_state && aq_form == 'state' ">
+			<h3 class="w3-center w3-border w3-light-gray">Sterowanie akwarium</h3>
 			<br>
 			<table class="actions w3-table w3-border w3-bordered">
 				<tr class="w3-light-grey">
@@ -165,7 +161,7 @@
 						<i class="w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
 					</td>
 					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelayTasks($index)">edit</i>
+						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelay($index)">edit</i>
 					</td>
 				</tr>
 			</table>

@@ -6,6 +6,7 @@ import (
 	"os"
 	"piaqua/pkg/config"
 	"piaqua/pkg/hal"
+	"strconv"
 	"sync"
 )
 
@@ -87,11 +88,21 @@ func (c *Controller) Stop() {
 }
 
 func (c *Controller) init() {
+	for i := range c.state.Sensors {
+		sensor := &c.state.Sensors[i]
+		if sensor.Name == "" {
+			sensor.Name = strconv.Itoa(i + 1)
+		}
+	}
 	for i := range c.state.Relays {
-		for j := range c.state.Relays[i].Tasks {
+		relay := &c.state.Relays[i]
+		for j := range relay.Tasks {
 			if j > c.lastID {
 				c.lastID = j
 			}
+		}
+		if relay.Name == "" {
+			relay.Name = strconv.Itoa(i + 1)
 		}
 	}
 	for i := range c.state.Actions {

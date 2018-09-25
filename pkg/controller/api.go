@@ -19,6 +19,10 @@ func (c *Controller) GetControllerState() ([]byte, error) {
 }
 
 func (c *Controller) SetSensorName(id int, name string) error {
+	if name == "" {
+		return errArg
+	}
+
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -35,6 +39,10 @@ func (c *Controller) SetSensorName(id int, name string) error {
 }
 
 func (c *Controller) SetRelayName(id int, name string) error {
+	if name == "" {
+		return errArg
+	}
+
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

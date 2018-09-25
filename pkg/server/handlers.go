@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"piaqua/pkg/controller"
 	"piaqua/pkg/model"
@@ -93,6 +94,48 @@ func removeAction(c *controller.Controller) httprouter.Handle {
 			return
 		}
 		err = c.RemoveAction(id)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func setSensorName(c *controller.Controller) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		id, err := strconv.Atoi(p.ByName("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		err = c.SetSensorName(id, string(body))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func setRelayName(c *controller.Controller) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		id, err := strconv.Atoi(p.ByName("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		err = c.SetRelayName(id, string(body))
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return

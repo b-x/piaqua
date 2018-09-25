@@ -18,6 +18,8 @@ func (s *Server) Start(c *controller.Controller) error {
 	router.PUT("/action/:id", updateAction(c))
 	router.PUT("/action/:id/toggle", toggleAction(c))
 	router.DELETE("/action/:id", removeAction(c))
+	router.PUT("/sensor/:id/name", setSensorName(c))
+	router.PUT("/relay/:id/name", setRelayName(c))
 
 	s.srv = &http.Server{Addr: "[::1]:8080", Handler: router}
 	err := s.srv.ListenAndServe()

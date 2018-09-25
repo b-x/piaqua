@@ -57,16 +57,14 @@ app.controller('state', function ($scope, $http, $interval) {
 	$scope.setSensorName = function (id, name) {
 		$http.put('api/sensor/' + id + '/name', name).
 			then(function (response) {
+				$scope.showState()
 			});
 	};
+
 	$scope.setRelayName = function (id, name) {
 		$http.put('api/relay/' + id + '/name', name).
 			then(function (response) {
-			});
-	};
-	$scope.setActionName = function (id, name) {
-		$http.put('api/action/' + id + '/name', name).
-			then(function (response) {
+				$scope.getState()
 			});
 	};
 
@@ -107,7 +105,7 @@ app.controller('state', function ($scope, $http, $interval) {
 		if (id >= 0) {
 			$scope.aq_edit_action = angular.copy($scope.aq_state.actions[id])
 		} else {
-			$scope.aq_edit_action = { duration: 0 }
+			$scope.aq_edit_action = {}
 		}
 		$scope.aq_edit_action_relays = $scope.aq_state.relays.map(x => x.name)
 		$scope.aq_edit_action_buttons = Array.from(new Array($scope.aq_state.buttons), (x, i) => i + 1)
@@ -120,10 +118,10 @@ app.controller('state', function ($scope, $http, $interval) {
 		$scope.aq_form = 'sensor'
 	}
 
-	$scope.editRelayTasks = function (id) {
-		$scope.aq_edit_task_id = id
+	$scope.editRelay = function (id) {
+		$scope.aq_edit_relay_id = id
 		$scope.aq_edit_relay_name = $scope.aq_state.relays[id].name
-		$scope.aq_form = 'tasks'
+		$scope.aq_form = 'relay'
 	}
 
 	$scope.showState()

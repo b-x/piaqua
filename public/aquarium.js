@@ -1,3 +1,10 @@
+const weekDays = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb', 'Nd'];
+
+function weekDayBit(day) {
+	const weekDaysOrder = [1, 2, 3, 4, 5, 6, 0];
+	return 1 << weekDaysOrder[day];
+}
+
 var app = angular.module('aquarium', [])
 
 app.directive('aqDuration', function () {
@@ -29,15 +36,12 @@ app.filter('aqDuration', function ($filter) {
 
 app.filter('aqWeekdays', function () {
 	return function (value) {
-		const order = [1, 2, 3, 4, 5, 6, 0];
-		const days = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
-
 		if (value == 127) {
 			return "codziennie";
 		}
-		return order
-			.filter(i => value & (1 << i))
-			.map(i => days[i])
+		return weekDays
+			.filter((d, i) => value & weekDayBit(i))
+			.map(d => d.toLowerCase())
 			.join(', ');
 	}
 });
@@ -64,13 +68,14 @@ app.controller('state', function ($scope, $http, $interval) {
 	$scope.setRelayName = function (id, name) {
 		$http.put('api/relay/' + id + '/name', name).
 			then(function (response) {
-				$scope.getState()
+				$scope.showState()
 			});
 	};
 
 	$scope.toggleAction = function (id) {
 		$http.put('api/action/' + id + '/toggle').
 			then(function (response) {
+				$scope.getState()
 			})
 	}
 
@@ -95,9 +100,35 @@ app.controller('state', function ($scope, $http, $interval) {
 			})
 	}
 
+	$scope.updateTask = function (relay_id, id, task) {
+		$http.put('api/relay/' + relay_id + '/task/' + id, task).
+			then(function (response) {
+				$scope.showRelay()
+			})
+	}
+
+	$scope.addTask = function (relay_id, task) {
+		$http.post('api/relay/' + relay_id + '/task', task).
+			then(function (response) {
+				$scope.showRelay()
+			})
+	}
+
+	$scope.removeTask = function (relay_id, id) {
+		$http.delete('api/relay/' + relay_id + '/task/' + id).
+			then(function (response) {
+				$scope.showRelay()
+			})
+	}
+
 	$scope.showState = function () {
 		$scope.getState()
 		$scope.aq_form = 'state'
+	}
+
+	$scope.showRelay = function () {
+		$scope.getState()
+		$scope.aq_form = 'relay'
 	}
 
 	$scope.editAction = function (id) {
@@ -105,7 +136,7 @@ app.controller('state', function ($scope, $http, $interval) {
 		if (id >= 0) {
 			$scope.aq_edit_action = angular.copy($scope.aq_state.actions[id])
 		} else {
-			$scope.aq_edit_action = {}
+			$scope.aq_edit_action = { duration: 0 }
 		}
 		$scope.aq_edit_action_relays = $scope.aq_state.relays.map(x => x.name)
 		$scope.aq_edit_action_buttons = Array.from(new Array($scope.aq_state.buttons), (x, i) => i + 1)
@@ -124,6 +155,29 @@ app.controller('state', function ($scope, $http, $interval) {
 		$scope.aq_form = 'relay'
 	}
 
-	$scope.showState()
-	getPeriodically = $interval($scope.getState, 30000);
+	$scope.editTask = function (id) {
+		$scope.aq_edit_task_id = id
+		if (id >= 0) {
+			let relay = $scope.aq_state.relays[$scope.aq_edit_relay_id]
+			$scope.aq_edit_task = angular.copy(relay.tasks[id])
+		} else {
+			$scope.aq_edit_task = { start: 0, stop: 0, weekdays: 127 }
+		}
+		$scope.aq_form = 'task'
+	}
+
+	$scope.weekDays = function () {
+		return weekDays;
+	}
+
+	$scope.isWeekDaySelected = function (day) {
+		return $scope.aq_edit_task.weekdays & weekDayBit(day);
+	}
+
+	$scope.toggleWeekDay = function (day) {
+		$scope.aq_edit_task.weekdays ^= weekDayBit(day);
+	}
+
+	$scope.showState();
+	$interval($scope.getState, 30000);
 });

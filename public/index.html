@@ -43,8 +43,7 @@
 				</p>
 				<p>
 					<label>Czas trwania</label>
-					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" min="00:00:01" aq-duration
-					 required>
+					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
 				</p>
 				<p class="w3-right">
 					<button class="w3-btn w3-light-gray" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0"
@@ -91,7 +90,7 @@
 					<th>Stop</th>
 					<th>Dni tygodnia</th>
 					<th>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="addTask(-1)">add</i>
+						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(-1)">add</i>
 					</th>
 				</tr>
 				<tr ng-repeat="(k, x) in aq_state.relays[aq_edit_relay_id].tasks">
@@ -106,6 +105,40 @@
 			<p class="w3-right">
 				<button class="w3-btn w3-light-gray" ng-click="showState()">Wróć</button>
 			</p>
+		</div>
+
+		<div ng-if="aq_state && aq_form == 'task'">
+			<h3 class="w3-center w3-border w3-light-grey" ng-if="aq_edit_task_id < 0">Nowe zadanie</h3>
+			<h3 class="w3-center w3-border w3-light-grey" ng-if="aq_edit_task_id >= 0">Edycja zadania</h3>
+			<form class="w3-container w3-border" name="aq_form_task">
+				<p>
+					<label>Włącznik</label>
+					<input class="w3-input" type="text" ng-model="aq_edit_relay_name" disabled>
+				</p>
+				<p>
+					<label>Start</label>
+					<input class="w3-input" type="time" ng-model="aq_edit_task.start" step="1" aq-duration required>
+				</p>
+				<p>
+					<label>Stop</label>
+					<input class="w3-input" type="time" ng-model="aq_edit_task.stop" step="1" aq-duration required>
+				</p>
+				<p>
+					<label>Dni tygodnia</label>
+					<div>
+						<i ng-repeat="day in weekDays()" ng-class="isWeekDaySelected($index) ? 'w3-btn w3-padding-small w3-circle w3-border w3-amber' : 'w3-btn w3-padding-small w3-circle w3-border'"
+						 ng-click="toggleWeekDay($index)" style="font-family: monospace; margin: 2px;">{{ day }}</i>
+					</div>
+				</p>
+				<p class="w3-right">
+					<button class="w3-btn w3-light-gray" ng-click="addTask(aq_edit_relay_id, aq_edit_task)" ng-if="aq_edit_task_id < 0"
+					 ng-disabled="!aq_form_task.$valid">Dodaj</button>
+					<button class="w3-btn w3-light-gray" ng-click="updateTask(aq_edit_relay_id, aq_edit_task_id, aq_edit_task)" ng-if="aq_edit_task_id >= 0"
+					 ng-disabled="!aq_form_task.$valid">Zapisz</button>
+					<button class="w3-btn w3-light-gray" ng-click="removeTask(aq_edit_relay_id, aq_edit_task_id)" ng-if="aq_edit_task_id >= 0">Usuń</button>
+					<button class="w3-btn w3-light-gray" ng-click="showRelay()">Anuluj</button>
+				</p>
+			</form>
 		</div>
 
 		<div ng-if="aq_state && aq_form == 'state' ">

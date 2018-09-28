@@ -143,3 +143,80 @@ func setRelayName(c *controller.Controller) httprouter.Handle {
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
+
+func addRelayTask(c *controller.Controller) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		relayId, err := strconv.Atoi(p.ByName("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		decoder := json.NewDecoder(r.Body)
+		var task model.RelayTask
+		err = decoder.Decode(&task)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		id, err := c.AddRelayTask(relayId, &task)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		ret, _ := json.Marshal(struct {
+			Id int `json:"id"`
+		}{id})
+		w.Write(ret)
+	}
+}
+
+func updateRelayTask(c *controller.Controller) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		relayId, err := strconv.Atoi(p.ByName("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		taskId, err := strconv.Atoi(p.ByName("tid"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		decoder := json.NewDecoder(r.Body)
+		var task model.RelayTask
+		err = decoder.Decode(&task)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		err = c.UpdateRelayTask(relayId, taskId, &task)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func removeRelayTask(c *controller.Controller) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		relayId, err := strconv.Atoi(p.ByName("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		taskId, err := strconv.Atoi(p.ByName("tid"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		err = c.RemoveRelayTask(relayId, taskId)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}

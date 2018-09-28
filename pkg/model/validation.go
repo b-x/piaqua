@@ -5,7 +5,7 @@ import (
 )
 
 func isValidDuration24h(duration time.Duration) bool {
-	return duration > 0 && duration < time.Hour*24
+	return duration >= 0 && duration < time.Hour*24
 }
 
 func (wd Weekdays) IsValid() bool {

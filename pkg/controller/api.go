@@ -34,7 +34,7 @@ func (c *Controller) SetSensorName(id int, name string) error {
 		return nil
 	}
 	sensor.Name = name
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
@@ -54,7 +54,7 @@ func (c *Controller) SetRelayName(id int, name string) error {
 		return nil
 	}
 	relay.Name = name
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
@@ -73,7 +73,7 @@ func (c *Controller) AddRelayTask(relayID int, task *model.RelayTask) (int, erro
 	relay := &c.state.Relays[relayID]
 	id := c.newID()
 	relay.Tasks[id] = task
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return id, nil
 }
 
@@ -96,7 +96,7 @@ func (c *Controller) UpdateRelayTask(relayID int, taskID int, task *model.RelayT
 	}
 
 	relay.Tasks[taskID] = task
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
@@ -114,7 +114,7 @@ func (c *Controller) RemoveRelayTask(relayID int, taskID int) error {
 	}
 
 	delete(relay.Tasks, taskID)
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
@@ -128,7 +128,7 @@ func (c *Controller) AddAction(action *model.Action) (int, error) {
 
 	id := c.newID()
 	c.state.Actions[id] = action
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return id, nil
 }
 
@@ -146,7 +146,7 @@ func (c *Controller) UpdateAction(id int, action *model.Action) error {
 	}
 
 	c.state.Actions[id] = action
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
@@ -159,13 +159,11 @@ func (c *Controller) RemoveAction(id int) error {
 		return nil
 	}
 	delete(c.state.Actions, id)
-	c.saveConfig()
+	c.applyChanges(time.Now())
 	return nil
 }
 
 func (c *Controller) ToggleAction(id int) error {
-	now := time.Now()
-
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -174,11 +172,8 @@ func (c *Controller) ToggleAction(id int) error {
 		return errID
 	}
 
-	if action.IsActive(now) {
-		action.Start = time.Time{}
-	} else {
-		action.Start = now
-	}
-	c.saveConfig()
+	now := time.Now()
+	action.Toggle(now)
+	c.applyChanges(now)
 	return nil
 }

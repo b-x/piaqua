@@ -9,7 +9,7 @@ import (
 )
 
 // ControllerConf controller config
-type ControllerConf model.System
+type ControllerConf struct{ model.System }
 
 const controllerConfigFilename = "/controller.yml"
 

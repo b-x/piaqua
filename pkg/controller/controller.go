@@ -8,6 +8,7 @@ import (
 	"piaqua/pkg/hal"
 	"strconv"
 	"sync"
+	"time"
 )
 
 // Controller aquarium controller
@@ -23,6 +24,8 @@ type Controller struct {
 	lastID    int
 	mutex     sync.Mutex
 }
+
+const updateStateInterval = time.Second
 
 // NewController creates and runs a controller
 func NewController(configDir string) (*Controller, error) {
@@ -110,6 +113,8 @@ func (c *Controller) init() {
 			c.lastID = i
 		}
 	}
+
+	c.updateState(time.Now())
 }
 
 func (c *Controller) newID() int {
@@ -124,10 +129,13 @@ func (c *Controller) saveConfig() {
 }
 
 func (c *Controller) processEvents(quit <-chan struct{}, events <-chan hal.Event) {
+	ticker := time.Tick(updateStateInterval)
 	for {
 		select {
 		case <-quit:
 			return
+		case <-ticker:
+			c.onUpdateState()
 		case event := <-events:
 			switch e := event.(type) {
 			case hal.ButtonPressed:
@@ -161,4 +169,49 @@ func (c *Controller) onTempError(e hal.TemperatureError) {
 
 func (c *Controller) onButtonPressed(e hal.ButtonPressed) {
 	log.Printf("Button %d pressed\n", e.ID)
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	now := time.Now()
+
+	for _, action := range c.state.Actions {
+		if action.Button != nil && *action.Button == e.ID {
+			action.Toggle(now)
+		}
+	}
+
+	c.applyChanges(now)
+}
+
+func (c *Controller) onUpdateState() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.updateState(time.Now())
+}
+
+func (c *Controller) applyChanges(t time.Time) {
+	c.saveConfig()
+	c.updateState(t)
+}
+
+func (c *Controller) updateState(t time.Time) {
+	c.state.Update(t)
+	c.updatePins()
+}
+
+func (c *Controller) updatePins() {
+	for i := range c.state.Relays {
+		relay := &c.state.Relays[i]
+		if c.pins.GetRelay(i) != relay.On {
+			c.pins.SetRelay(i, relay.On)
+
+			if relay.On {
+				log.Printf("Relay on:  '%s'\n", relay.Name)
+			} else {
+				log.Printf("Relay off: '%s'\n", relay.Name)
+			}
+		}
+	}
 }

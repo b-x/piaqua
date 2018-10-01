@@ -41,7 +41,7 @@ func (p *Pins) Init(hwConf *config.HardwareConf) error {
 	}
 	for _, pin := range p.relays {
 		pin.Output()
-		pin.Write(rpio.Low)
+		//pin.Write(rpio.Low)
 	}
 	return nil
 }
@@ -80,6 +80,10 @@ func (p *Pins) updateButtonsState(events chan<- Event) {
 			events <- ButtonPressed{i}
 		}
 	}
+}
+
+func (p *Pins) GetRelay(id int) bool {
+	return p.relays[id].Read() != rpio.Low
 }
 
 func (p *Pins) SetRelay(id int, on bool) {

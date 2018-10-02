@@ -3,6 +3,7 @@
 
 <head>
 	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<title>Akwarium</title>
 	<link rel="icon" type="image/png" href="fish.png">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -12,10 +13,9 @@
 </head>
 
 <body ng-app="aquarium">
-	<div ng-controller="state" class="w3-container" style="width:35em; margin:0 auto">
+	<div ng-controller="state" style="padding:8px; max-width:500px; margin:auto">
 		<div ng-if="aq_error">
-			<br>
-			<div class="w3-container w3-pale-red w3-center w3-border w3-border-red">
+			<div class="w3-pale-red w3-center w3-border w3-border-red">
 				<h3>Błąd: {{aq_error}}</h3>
 			</div>
 		</div>
@@ -46,12 +46,12 @@
 					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0"
+					<button class="w3-btn w3-light-grey" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0"
 					 ng-disabled="!aq_form_action.$valid">Dodaj</button>
-					<button class="w3-btn w3-light-gray" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0"
+					<button class="w3-btn w3-light-grey" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0"
 					 ng-disabled="!aq_form_action.$valid">Zapisz</button>
-					<button class="w3-btn w3-light-gray" ng-click="removeAction(aq_edit_action_id)" ng-if="aq_edit_action_id >= 0">Usuń</button>
-					<button class="w3-btn w3-light-gray" ng-click="showState()">Anuluj</button>
+					<button class="w3-btn w3-light-grey" ng-click="removeAction(aq_edit_action_id)" ng-if="aq_edit_action_id >= 0">Usuń</button>
+					<button class="w3-btn w3-light-grey" ng-click="showState()">Anuluj</button>
 				</p>
 			</form>
 		</div>
@@ -64,9 +64,9 @@
 					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_sensor_name" required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-disabled="!aq_form_sensor.$valid || aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
+					<button class="w3-btn w3-light-grey" ng-disabled="!aq_form_sensor.$valid || aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
 					 ng-click="setSensorName(aq_edit_sensor_id, aq_edit_sensor_name)">Zapisz</button>
-					<button class="w3-btn w3-light-gray" ng-click="showState()">Anuluj</button>
+					<button class="w3-btn w3-light-grey" ng-click="showState()">Anuluj</button>
 				</p>
 			</form>
 		</div>
@@ -79,12 +79,11 @@
 					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_relay_name" required>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-disabled="!aq_form_relay.$valid || aq_edit_relay_name == aq_state.relays[aq_edit_relay_id].name"
+					<button class="w3-btn w3-light-grey" ng-disabled="!aq_form_relay.$valid || aq_edit_relay_name == aq_state.relays[aq_edit_relay_id].name"
 					 ng-click="setRelayName(aq_edit_relay_id, aq_edit_relay_name)">Zapisz</button>
 				</p>
 			</form>
-			<br>
-			<table class="tasks w3-table w3-border w3-bordered">
+			<table class="tasks w3-table w3-border w3-bordered w3-margin-top">
 				<tr class="w3-light-grey">
 					<th>Start</th>
 					<th>Stop</th>
@@ -103,7 +102,7 @@
 				</tr>
 			</table>
 			<p class="w3-right">
-				<button class="w3-btn w3-light-gray" ng-click="showState()">Wróć</button>
+				<button class="w3-btn w3-light-grey" ng-click="showState()">Wróć</button>
 			</p>
 		</div>
 
@@ -127,24 +126,23 @@
 					<label>Dni tygodnia</label>
 					<div>
 						<i ng-repeat="day in weekDays()" ng-class="isWeekDaySelected($index) ? 'w3-btn w3-padding-small w3-circle w3-border w3-amber' : 'w3-btn w3-padding-small w3-circle w3-border'"
-						 ng-click="toggleWeekDay($index)" style="font-family: monospace; margin: 2px;">{{ day }}</i>
+						 ng-click="toggleWeekDay($index)" style="font-family: 'Courier New', Courier, monospace; margin: 2px;">{{ day }}</i>
 					</div>
 				</p>
 				<p class="w3-right">
-					<button class="w3-btn w3-light-gray" ng-click="addTask(aq_edit_relay_id, aq_edit_task)" ng-if="aq_edit_task_id < 0"
+					<button class="w3-btn w3-light-grey" ng-click="addTask(aq_edit_relay_id, aq_edit_task)" ng-if="aq_edit_task_id < 0"
 					 ng-disabled="!aq_form_task.$valid">Dodaj</button>
-					<button class="w3-btn w3-light-gray" ng-click="updateTask(aq_edit_relay_id, aq_edit_task_id, aq_edit_task)" ng-if="aq_edit_task_id >= 0"
+					<button class="w3-btn w3-light-grey" ng-click="updateTask(aq_edit_relay_id, aq_edit_task_id, aq_edit_task)" ng-if="aq_edit_task_id >= 0"
 					 ng-disabled="!aq_form_task.$valid">Zapisz</button>
-					<button class="w3-btn w3-light-gray" ng-click="removeTask(aq_edit_relay_id, aq_edit_task_id)" ng-if="aq_edit_task_id >= 0">Usuń</button>
-					<button class="w3-btn w3-light-gray" ng-click="showRelay()">Anuluj</button>
+					<button class="w3-btn w3-light-grey" ng-click="removeTask(aq_edit_relay_id, aq_edit_task_id)" ng-if="aq_edit_task_id >= 0">Usuń</button>
+					<button class="w3-btn w3-light-grey" ng-click="showRelay()">Anuluj</button>
 				</p>
 			</form>
 		</div>
 
 		<div ng-if="aq_state && aq_form == 'state' ">
-			<h3 class="w3-center w3-border w3-light-gray">Sterowanie akwarium</h3>
-			<br>
-			<table class="actions w3-table w3-border w3-bordered">
+			<h3 class="w3-center w3-border w3-light-grey">Sterowanie akwarium</h3>
+			<table class="actions w3-table w3-border w3-bordered w3-margin-top">
 				<tr class="w3-light-grey">
 					<th style="width:66%">Akcja</th>
 					<th></th>
@@ -163,8 +161,7 @@
 					</td>
 				</tr>
 			</table>
-			<br>
-			<table class="sensors w3-table w3-border w3-bordered">
+			<table class="sensors w3-table w3-border w3-bordered w3-margin-top">
 				<tr class="w3-light-grey">
 					<th style="width:66%">Sensor</th>
 					<th></th>
@@ -180,8 +177,7 @@
 					</td>
 				</tr>
 			</table>
-			<br>
-			<table class="relays w3-table w3-border w3-bordered">
+			<table class="relays w3-table w3-border w3-bordered w3-margin-top">
 				<tr class="w3-light-grey">
 					<th style="width:66%">Włącznik</th>
 					<th></th>

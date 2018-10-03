@@ -18,29 +18,23 @@ func main() {
 	}
 
 	quit := make(chan os.Signal, 1)
-	done := make(chan struct{})
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	var srv server.Server
-
-	go func() {
-		<-quit
-		srv.Stop()
-		close(done)
-	}()
-
-	log.Println("Controller is starting")
-	c, err := controller.NewController(configDir)
+	ctrl, err := controller.NewController(configDir)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	log.Println("Controller started")
-	err = srv.Start(c)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	<-done
-	log.Println("Controller is stopping")
-	c.Stop()
+
+	httpServer := server.NewHTTPServer(ctrl)
+
+	go func() {
+		<-quit
+		httpServer.Close()
+	}()
+
+	log.Println(httpServer.ListenAndServe())
+
+	ctrl.Stop()
 	log.Println("Controller stopped")
 }

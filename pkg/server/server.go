@@ -1,36 +1,38 @@
 package server
 
 import (
+	"log"
+	"net"
 	"net/http"
 	"piaqua/pkg/controller"
-
-	"github.com/julienschmidt/httprouter"
+	"time"
 )
 
-type Server struct {
-	srv *http.Server
+type HTTPServer struct {
+	srv http.Server
 }
 
-func (s *Server) Start(c *controller.Controller) error {
-	router := httprouter.New()
-	router.GET("/state", state(c))
-	router.POST("/action", addAction(c))
-	router.PUT("/action/:id", updateAction(c))
-	router.PUT("/action/:id/toggle", toggleAction(c))
-	router.DELETE("/action/:id", removeAction(c))
-	router.PUT("/sensor/:id/name", setSensorName(c))
-	router.PUT("/relay/:id/name", setRelayName(c))
-	router.POST("/relay/:id/task", addRelayTask(c))
-	router.PUT("/relay/:id/task/:tid", updateRelayTask(c))
-	router.DELETE("/relay/:id/task/:tid", removeRelayTask(c))
-
-	s.srv = &http.Server{Addr: "[::1]:8080", Handler: router}
-	err := s.srv.ListenAndServe()
-	return err
+func NewHTTPServer(c *controller.Controller) *HTTPServer {
+	return &HTTPServer{
+		srv: http.Server{
+			Addr:           "0.0.0.0:80",
+			Handler:        newHandler(c),
+			ReadTimeout:    5 * time.Second,
+			WriteTimeout:   7 * time.Second,
+			IdleTimeout:    70 * time.Second,
+			MaxHeaderBytes: 1 << 16,
+		}}
 }
 
-func (s *Server) Stop() {
-	if s.srv != nil {
-		s.srv.Close()
+func (s *HTTPServer) ListenAndServe() error {
+	ln, err := net.Listen("tcp4", s.srv.Addr)
+	if err != nil {
+		return err
 	}
+	log.Println("http: Server listen on", ln.Addr())
+	return s.srv.Serve(ln)
+}
+
+func (s *HTTPServer) Close() {
+	s.srv.Close()
 }

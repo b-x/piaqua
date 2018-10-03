@@ -16,7 +16,8 @@
 	<div ng-controller="state" style="padding:8px; max-width:500px; margin:auto">
 		<div ng-if="aq_error">
 			<div class="w3-pale-red w3-center w3-border w3-border-red">
-				<h3>Błąd: {{aq_error}}</h3>
+				<h3 ng-if="aq_error == 401">Brak dostępu!</h3>
+				<h3 ng-if="aq_error != 401">Błąd: {{aq_error}}</h3>
 			</div>
 		</div>
 

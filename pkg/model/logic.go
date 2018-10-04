@@ -1,7 +1,7 @@
 package model
 
 import (
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -12,10 +12,10 @@ func (a *Action) IsActive(t time.Time) bool {
 func (a *Action) Toggle(t time.Time) {
 	if a.IsActive(t) {
 		a.Start = time.Time{}
-		log.Printf("Action cancelled: '%s'\n", a.Name)
+		fmt.Printf("Action cancelled: '%s'\n", a.Name)
 	} else {
 		a.Start = t
-		log.Printf("Action triggered: '%s'\n", a.Name)
+		fmt.Printf("Action triggered: '%s'\n", a.Name)
 	}
 }
 

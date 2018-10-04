@@ -1,7 +1,7 @@
 package server
 
 import (
-	"log"
+	"fmt"
 	"net"
 	"net/http"
 	"piaqua/pkg/config"
@@ -35,7 +35,7 @@ func (s *HTTPServer) ListenAndServe() error {
 	if err != nil {
 		return err
 	}
-	log.Println("http: Server listen on", ln.Addr())
+	fmt.Println("http: Server listen on", ln.Addr())
 	return s.srv.Serve(ln)
 }
 

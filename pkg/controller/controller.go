@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"piaqua/pkg/config"
 	"piaqua/pkg/hal"
@@ -124,7 +123,7 @@ func (c *Controller) newID() int {
 
 func (c *Controller) saveConfig() {
 	if err := c.state.Write(c.configDir); err != nil {
-		log.Println("couldn't save config:", err)
+		fmt.Println("couldn't save config:", err)
 	}
 }
 
@@ -159,7 +158,7 @@ func (c *Controller) onTempRead(e hal.TemperatureRead) {
 }
 
 func (c *Controller) onTempError(e hal.TemperatureError) {
-	log.Printf("Sensor %d error: %s\n", e.ID, e.Error)
+	fmt.Printf("Sensor %d error: %s\n", e.ID, e.Error)
 
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -168,7 +167,7 @@ func (c *Controller) onTempError(e hal.TemperatureError) {
 }
 
 func (c *Controller) onButtonPressed(e hal.ButtonPressed) {
-	log.Printf("Button %d pressed\n", e.ID)
+	fmt.Printf("Button %d pressed\n", e.ID)
 
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -208,9 +207,9 @@ func (c *Controller) updatePins() {
 			c.pins.SetRelay(i, relay.On)
 
 			if relay.On {
-				log.Printf("Relay on:  '%s'\n", relay.Name)
+				fmt.Printf("Relay on:  '%s'\n", relay.Name)
 			} else {
-				log.Printf("Relay off: '%s'\n", relay.Name)
+				fmt.Printf("Relay off: '%s'\n", relay.Name)
 			}
 		}
 	}

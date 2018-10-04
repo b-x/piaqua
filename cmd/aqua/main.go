@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
 	"piaqua/pkg/controller"
@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	if !singleinstance.Lock("piaqua") {
-		log.Fatalln("Another instance of a program is already running")
+		panic("Another instance of a program is already running")
 	}
 
 	quit := make(chan os.Signal, 1)
@@ -26,13 +26,13 @@ func main() {
 
 	ctrl, err := controller.NewController(*configDir)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
-	log.Println("Controller started")
+	fmt.Println("Controller started")
 
 	httpServer, err := server.NewHTTPServer(*configDir, ctrl)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	go func() {
@@ -40,8 +40,8 @@ func main() {
 		httpServer.Close()
 	}()
 
-	log.Println(httpServer.ListenAndServe())
+	fmt.Println(httpServer.ListenAndServe())
 
 	ctrl.Stop()
-	log.Println("Controller stopped")
+	fmt.Println("Controller stopped")
 }

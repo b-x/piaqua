@@ -1,0 +1,15 @@
+[Unit]
+Description = Aquarium Controller
+After = network.target
+StartLimitIntervalSec = 0
+
+[Service]
+Type = simple
+Restart = always
+RestartSec = 10
+User = aqua
+WorkingDirectory = /opt/aqua
+ExecStart = /opt/aqua/aqua
+
+[Install]
+WantedBy = multi-user.target

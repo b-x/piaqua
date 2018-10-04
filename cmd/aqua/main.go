@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -10,9 +11,12 @@ import (
 	"syscall"
 )
 
-const configDir = "."
+const defaultConfigDir = "configs"
 
 func main() {
+	configDir := flag.String("c", defaultConfigDir, "config directory")
+	flag.Parse()
+
 	if !singleinstance.Lock("piaqua") {
 		log.Fatalln("Another instance of a program is already running")
 	}
@@ -20,13 +24,16 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	ctrl, err := controller.NewController(configDir)
+	ctrl, err := controller.NewController(*configDir)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	log.Println("Controller started")
 
-	httpServer := server.NewHTTPServer(ctrl)
+	httpServer, err := server.NewHTTPServer(*configDir, ctrl)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	go func() {
 		<-quit

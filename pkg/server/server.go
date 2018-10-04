@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"piaqua/pkg/config"
 	"piaqua/pkg/controller"
 	"time"
 )
@@ -12,16 +13,21 @@ type HTTPServer struct {
 	srv http.Server
 }
 
-func NewHTTPServer(c *controller.Controller) *HTTPServer {
+func NewHTTPServer(configDir string, c *controller.Controller) (*HTTPServer, error) {
+	var conf config.ServerConf
+	err := conf.Read(configDir)
+	if err != nil {
+		return nil, err
+	}
 	return &HTTPServer{
 		srv: http.Server{
-			Addr:           "0.0.0.0:80",
-			Handler:        newHandler(c),
+			Addr:           conf.Address,
+			Handler:        newHandler(&conf, c),
 			ReadTimeout:    5 * time.Second,
 			WriteTimeout:   7 * time.Second,
 			IdleTimeout:    70 * time.Second,
 			MaxHeaderBytes: 1 << 16,
-		}}
+		}}, nil
 }
 
 func (s *HTTPServer) ListenAndServe() error {

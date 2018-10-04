@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"piaqua/pkg/config"
 	"piaqua/pkg/controller"
 	"strings"
 
@@ -25,16 +26,16 @@ var apiRoutes = []struct {
 	{"DELETE", "/api/relay/:id/task/:tid", removeRelayTask},
 }
 
-func newHandler(c *controller.Controller) http.Handler {
+func newHandler(conf *config.ServerConf, c *controller.Controller) http.Handler {
 
 	apiRouter := &httprouter.Router{}
 	for _, r := range apiRoutes {
-		apiRouter.Handle(r.method, r.path, basicAuth(r.handler(c)))
+		apiRouter.Handle(r.method, r.path, basicAuth(conf.Credentials, r.handler(c)))
 	}
 
 	return &muxHandler{
 		api:    apiRouter,
-		static: http.FileServer(http.Dir("public")),
+		static: http.FileServer(http.Dir(conf.Path)),
 	}
 }
 
@@ -53,15 +54,19 @@ func (h *muxHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.static.ServeHTTP(w, r)
 }
 
-func basicAuth(h httprouter.Handle) httprouter.Handle {
+func basicAuth(credentials map[string]string, h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		user, password, hasAuth := r.BasicAuth()
 
-		if hasAuth && user == "test" && password == "test" {
-			h(w, r, ps)
-		} else {
-			w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-			w.WriteHeader(http.StatusUnauthorized)
+		if hasAuth {
+			pass, found := credentials[user]
+			if found && password == pass {
+				h(w, r, ps)
+				return
+			}
 		}
+
+		w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+		w.WriteHeader(http.StatusUnauthorized)
 	}
 }

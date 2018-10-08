@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+SRC_DIR=$(realpath $(dirname "$0"))
+APP=${SRC_DIR##*/}
+
+docker run --rm \
+        -v "$SRC_DIR":/go/src/$APP \
+        -w /go/src/$APP \
+        -u $(id -u):$(id -g) \
+	-e GOCACHE=off \
+        golang:latest \
+        ./build $@

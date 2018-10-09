@@ -2,217 +2,217 @@
 <html>
 
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<title>Akwarium</title>
-	<link rel="icon" type="image/png" href="fish.png">
-	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
-	<script src="aquarium.js"></script>
-	<style>
-		h3 {margin:4px;font-size:20px}
-		.w3-table td, .w3-table th {padding:2px 8px;vertical-align:middle;height:32px}
-		.w3-margin-top{margin-top:8px!important}
-	</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Akwarium</title>
+  <link rel="icon" type="image/png" href="fish.png">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+  <script src="aquarium.js"></script>
+  <style>
+    h3 {margin:4px;font-size:20px}
+    .w3-table td, .w3-table th {padding:2px 8px;vertical-align:middle;height:32px}
+    .w3-margin-top{margin-top:8px!important}
+  </style>
 </head>
 
 <body ng-app="aquarium">
-	<div ng-controller="state" style="padding:8px; max-width:500px; margin:auto">
-		<div class="w3-card-2" ng-if="aq_error">
-			<div class="w3-container w3-center w3-pale-red" ng-switch="aq_error">
-				<h3 ng-switch-when="-1">Akwarium wyłączone!</h3>
-				<h3 ng-switch-when="401">Brak dostępu!</h3>
-				<h3 ng-switch-default>Błąd: {{aq_error}}</h3>
-			</div>
-		</div>
+  <div ng-controller="state" style="padding:8px; max-width:500px; margin:auto">
+    <div class="w3-card-2" ng-if="aq_error">
+      <div class="w3-container w3-center w3-pale-red" ng-switch="aq_error">
+        <h3 ng-switch-when="-1">Akwarium wyłączone!</h3>
+        <h3 ng-switch-when="401">Brak dostępu!</h3>
+        <h3 ng-switch-default>Błąd: {{aq_error}}</h3>
+      </div>
+    </div>
 
-		<div class="w3-card-2" ng-if="aq_state && aq_form == 'action'">
-			<div class="w3-container w3-center w3-red">
-				<h3 ng-if="aq_edit_action_id < 0">Nowa akcja</h3>
-				<h3 ng-if="aq_edit_action_id >= 0">Edycja akcji</h3>
-			</div>
-			<form class="w3-container" name="aq_form_action">
-				<p>
-					<label>Nazwa</label>
-					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_action.name" required>
-				</p>
-				<p>
-					<label>Włącznik</label>
-					<select class="w3-select" ng-model="aq_edit_action.relay" ng-options="idx*1 as relay for (idx, relay) in aq_edit_action_relays"
-					 required>
-						<option value="" ng-show="false">wybierz</option>
-					</select>
-				</p>
-				<p>
-					<label>Przycisk</label>
-					<select class="w3-select" ng-model="aq_edit_action.button" ng-options="idx*1 as name for (idx, name) in aq_edit_action_buttons">
-						<option value="">brak</option>
-					</select>
-				</p>
-				<p>
-					<label>Czas trwania</label>
-					<input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
-				</p>
-				<p class="w3-right">
-					<button class="w3-btn w3-red" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0" ng-disabled="!aq_form_action.$valid">Dodaj</button>
-					<button class="w3-btn w3-red" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0"
-					 ng-disabled="!aq_form_action.$valid">Zapisz</button>
-					<button class="w3-btn w3-red" ng-click="removeAction(aq_edit_action_id)" ng-if="aq_edit_action_id >= 0">Usuń</button>
-					<button class="w3-btn w3-red" ng-click="showState()">Anuluj</button>
-				</p>
-			</form>
-		</div>
+    <div class="w3-card-2" ng-if="aq_state && aq_form == 'action'">
+      <div class="w3-container w3-center w3-red">
+        <h3 ng-if="aq_edit_action_id < 0">Nowa akcja</h3>
+        <h3 ng-if="aq_edit_action_id >= 0">Edycja akcji</h3>
+      </div>
+      <form class="w3-container" name="aq_form_action">
+        <p>
+          <label>Nazwa</label>
+          <input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_action.name" required>
+        </p>
+        <p>
+          <label>Włącznik</label>
+          <select class="w3-select" ng-model="aq_edit_action.relay" ng-options="idx*1 as relay for (idx, relay) in aq_edit_action_relays"
+           required>
+            <option value="" ng-show="false">wybierz</option>
+          </select>
+        </p>
+        <p>
+          <label>Przycisk</label>
+          <select class="w3-select" ng-model="aq_edit_action.button" ng-options="idx*1 as name for (idx, name) in aq_edit_action_buttons">
+            <option value="">brak</option>
+          </select>
+        </p>
+        <p>
+          <label>Czas trwania</label>
+          <input class="w3-input" type="time" ng-model="aq_edit_action.duration" step="1" aq-duration required>
+        </p>
+        <p class="w3-right">
+          <button class="w3-btn w3-red" ng-click="addAction(aq_edit_action)" ng-if="aq_edit_action_id < 0" ng-disabled="!aq_form_action.$valid">Dodaj</button>
+          <button class="w3-btn w3-red" ng-click="updateAction(aq_edit_action_id, aq_edit_action)" ng-if="aq_edit_action_id >= 0"
+           ng-disabled="!aq_form_action.$valid">Zapisz</button>
+          <button class="w3-btn w3-red" ng-click="removeAction(aq_edit_action_id)" ng-if="aq_edit_action_id >= 0">Usuń</button>
+          <button class="w3-btn w3-red" ng-click="showState()">Anuluj</button>
+        </p>
+      </form>
+    </div>
 
-		<div class="w3-card-2" ng-if="aq_state && aq_form == 'sensor'">
-			<div class="w3-container w3-center w3-green">
-				<h3>Sensor {{ aq_edit_sensor_id + 1 }}</h3>
-			</div>
-			<form class="w3-container" name="aq_form_sensor">
-				<p>
-					<label>Nazwa</label>
-					<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_sensor_name" required>
-				</p>
-				<p class="w3-right">
-					<button class="w3-btn w3-green" ng-disabled="!aq_form_sensor.$valid || aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
-					 ng-click="setSensorName(aq_edit_sensor_id, aq_edit_sensor_name)">Zapisz</button>
-					<button class="w3-btn w3-green" ng-click="showState()">Anuluj</button>
-				</p>
-			</form>
-		</div>
+    <div class="w3-card-2" ng-if="aq_state && aq_form == 'sensor'">
+      <div class="w3-container w3-center w3-green">
+        <h3>Sensor {{ aq_edit_sensor_id + 1 }}</h3>
+      </div>
+      <form class="w3-container" name="aq_form_sensor">
+        <p>
+          <label>Nazwa</label>
+          <input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_sensor_name" required>
+        </p>
+        <p class="w3-right">
+          <button class="w3-btn w3-green" ng-disabled="!aq_form_sensor.$valid || aq_edit_sensor_name == aq_state.sensors[aq_edit_sensor_id].name"
+           ng-click="setSensorName(aq_edit_sensor_id, aq_edit_sensor_name)">Zapisz</button>
+          <button class="w3-btn w3-green" ng-click="showState()">Anuluj</button>
+        </p>
+      </form>
+    </div>
 
-		<div ng-if="aq_state && aq_form == 'relay'">
-			<div class="w3-card-2">
-				<div class="w3-container w3-center w3-blue">
-					<h3>Włącznik {{ aq_edit_relay_id + 1 }}</h3>
-				</div>
-				<form class="w3-container" name="aq_form_relay">
-					<p>
-						<label>Nazwa</label>
-						<input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_relay_name" required>
-					</p>
-					<p class="w3-right">
-						<button class="w3-btn w3-blue" ng-disabled="!aq_form_relay.$valid || aq_edit_relay_name == aq_state.relays[aq_edit_relay_id].name"
-						 ng-click="setRelayName(aq_edit_relay_id, aq_edit_relay_name)">Zapisz</button>
-						<button class="w3-btn w3-blue" ng-click="showState()">Anuluj</button>
-					</p>
-				</form>
-			</div>
-			<table class="tasks w3-table w3-bordered w3-margin-top w3-card-2">
-				<tr class="w3-blue">
-					<th>Start</th>
-					<th>Stop</th>
-					<th>Dni tygodnia</th>
-					<th>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(-1)">add</i>
-					</th>
-				</tr>
-				<tr ng-repeat="(k, x) in aq_state.relays[aq_edit_relay_id].tasks">
-					<td>{{ x.start | aqDuration }}</td>
-					<td>{{ x.stop | aqDuration }}</td>
-					<td>{{ x.weekdays | aqWeekdays }}</td>
-					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(k)">edit</i>
-					</td>
-				</tr>
-			</table>
-		</div>
+    <div ng-if="aq_state && aq_form == 'relay'">
+      <div class="w3-card-2">
+        <div class="w3-container w3-center w3-blue">
+          <h3>Włącznik {{ aq_edit_relay_id + 1 }}</h3>
+        </div>
+        <form class="w3-container" name="aq_form_relay">
+          <p>
+            <label>Nazwa</label>
+            <input class="w3-input" type="text" placeholder="ustaw nazwę" ng-model="aq_edit_relay_name" required>
+          </p>
+          <p class="w3-right">
+            <button class="w3-btn w3-blue" ng-disabled="!aq_form_relay.$valid || aq_edit_relay_name == aq_state.relays[aq_edit_relay_id].name"
+             ng-click="setRelayName(aq_edit_relay_id, aq_edit_relay_name)">Zapisz</button>
+            <button class="w3-btn w3-blue" ng-click="showState()">Anuluj</button>
+          </p>
+        </form>
+      </div>
+      <table class="tasks w3-table w3-bordered w3-margin-top w3-card-2">
+        <tr class="w3-blue">
+          <th>Start</th>
+          <th>Stop</th>
+          <th>Dni tygodnia</th>
+          <th>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(-1)">add</i>
+          </th>
+        </tr>
+        <tr ng-repeat="(k, x) in aq_state.relays[aq_edit_relay_id].tasks">
+          <td>{{ x.start | aqDuration }}</td>
+          <td>{{ x.stop | aqDuration }}</td>
+          <td>{{ x.weekdays | aqWeekdays }}</td>
+          <td>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(k)">edit</i>
+          </td>
+        </tr>
+      </table>
+    </div>
 
-		<div class="w3-card-2" ng-if="aq_state && aq_form == 'task'">
-			<div class="w3-container w3-center w3-blue">
-				<h3 ng-if="aq_edit_task_id < 0">Nowe zadanie</h3>
-				<h3 ng-if="aq_edit_task_id >= 0">Edycja zadania</h3>
-			</div>
-			<form class="w3-container" name="aq_form_task">
-				<p>
-					<label>Włącznik</label>
-					<input class="w3-input" type="text" ng-model="aq_edit_relay_name" disabled>
-				</p>
-				<p>
-					<label>Start</label>
-					<input class="w3-input" type="time" ng-model="aq_edit_task.start" step="1" aq-duration required>
-				</p>
-				<p>
-					<label>Stop</label>
-					<input class="w3-input" type="time" ng-model="aq_edit_task.stop" step="1" aq-duration required>
-				</p>
-				<p>
-					<label>Dni tygodnia</label>
-					<div>
-						<i ng-repeat="day in weekDays()" ng-class="isWeekDaySelected($index) ? 'w3-btn w3-padding-small w3-circle w3-border w3-amber' : 'w3-btn w3-padding-small w3-circle w3-border'"
-						 ng-click="toggleWeekDay($index)" style="font-family: 'Courier New', Courier, monospace; margin: 2px;">{{ day }}</i>
-					</div>
-				</p>
-				<p class="w3-right">
-					<button class="w3-btn w3-blue" ng-click="addTask(aq_edit_relay_id, aq_edit_task)" ng-if="aq_edit_task_id < 0"
-					 ng-disabled="!aq_form_task.$valid">Dodaj</button>
-					<button class="w3-btn w3-blue" ng-click="updateTask(aq_edit_relay_id, aq_edit_task_id, aq_edit_task)" ng-if="aq_edit_task_id >= 0"
-					 ng-disabled="!aq_form_task.$valid">Zapisz</button>
-					<button class="w3-btn w3-blue" ng-click="removeTask(aq_edit_relay_id, aq_edit_task_id)" ng-if="aq_edit_task_id >= 0">Usuń</button>
-					<button class="w3-btn w3-blue" ng-click="showRelay()">Anuluj</button>
-				</p>
-			</form>
-		</div>
+    <div class="w3-card-2" ng-if="aq_state && aq_form == 'task'">
+      <div class="w3-container w3-center w3-blue">
+        <h3 ng-if="aq_edit_task_id < 0">Nowe zadanie</h3>
+        <h3 ng-if="aq_edit_task_id >= 0">Edycja zadania</h3>
+      </div>
+      <form class="w3-container" name="aq_form_task">
+        <p>
+          <label>Włącznik</label>
+          <input class="w3-input" type="text" ng-model="aq_edit_relay_name" disabled>
+        </p>
+        <p>
+          <label>Start</label>
+          <input class="w3-input" type="time" ng-model="aq_edit_task.start" step="1" aq-duration required>
+        </p>
+        <p>
+          <label>Stop</label>
+          <input class="w3-input" type="time" ng-model="aq_edit_task.stop" step="1" aq-duration required>
+        </p>
+        <p>
+          <label>Dni tygodnia</label>
+          <div>
+            <i ng-repeat="day in weekDays()" ng-class="isWeekDaySelected($index) ? 'w3-btn w3-padding-small w3-circle w3-border w3-amber' : 'w3-btn w3-padding-small w3-circle w3-border'"
+             ng-click="toggleWeekDay($index)" style="font-family: 'Courier New', Courier, monospace; margin: 2px;">{{ day }}</i>
+          </div>
+        </p>
+        <p class="w3-right">
+          <button class="w3-btn w3-blue" ng-click="addTask(aq_edit_relay_id, aq_edit_task)" ng-if="aq_edit_task_id < 0"
+           ng-disabled="!aq_form_task.$valid">Dodaj</button>
+          <button class="w3-btn w3-blue" ng-click="updateTask(aq_edit_relay_id, aq_edit_task_id, aq_edit_task)" ng-if="aq_edit_task_id >= 0"
+           ng-disabled="!aq_form_task.$valid">Zapisz</button>
+          <button class="w3-btn w3-blue" ng-click="removeTask(aq_edit_relay_id, aq_edit_task_id)" ng-if="aq_edit_task_id >= 0">Usuń</button>
+          <button class="w3-btn w3-blue" ng-click="showRelay()">Anuluj</button>
+        </p>
+      </form>
+    </div>
 
-		<div ng-if="aq_state && aq_form == 'state' ">
-			<div class="w3-container w3-card-2 w3-center w3-brown w3-wide">
-				<h3>AKWARIUM</h3>
-			</div>
-			<table class="actions w3-table w3-bordered w3-margin-top w3-card-2">
-				<tr class="w3-red">
-					<th style="width:66%">Akcja</th>
-					<th></th>
-					<th>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(-1)">add</i>
-					</th>
-				</tr>
-				<tr ng-repeat="(k, x) in aq_state.actions">
-					<td>{{ x.name }}</td>
-					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons w3-text-amber" ng-if="x.on" ng-click="toggleAction(k)">wb_sunny</i>
-						<i class="w3-btn w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" ng-click="toggleAction(k)">wb_sunny</i>
-					</td>
-					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(k)">edit</i>
-					</td>
-				</tr>
-			</table>
-			<table class="sensors w3-table w3-bordered w3-margin-top w3-card-2">
-				<tr class="w3-green">
-					<th style="width:66%">Sensor</th>
-					<th></th>
-					<th></th>
-				</tr>
-				<tr ng-repeat="x in aq_state.sensors">
-					<td>{{ x.name }}</td>
-					<td>
-						<span class="w3-right">{{ x.value | number: 1 }} °C</span>
-					</td>
-					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editSensor($index)">edit</i>
-					</td>
-				</tr>
-			</table>
-			<table class="relays w3-table w3-bordered w3-margin-top w3-card-2">
-				<tr class="w3-blue">
-					<th style="width:66%">Włącznik</th>
-					<th></th>
-					<th></th>
-				</tr>
-				<tr ng-repeat="x in aq_state.relays">
-					<td>{{ x.name }}</td>
-					<td>
-						<i class="w3-right w3-padding-small material-icons w3-text-amber" ng-if="x.on">wb_sunny</i>
-						<i class="w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
-					</td>
-					<td>
-						<i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelay($index)">edit</i>
-					</td>
-				</tr>
-			</table>
-		</div>
+    <div ng-if="aq_state && aq_form == 'state' ">
+      <div class="w3-container w3-card-2 w3-center w3-brown w3-wide">
+        <h3>AKWARIUM</h3>
+      </div>
+      <table class="actions w3-table w3-bordered w3-margin-top w3-card-2">
+        <tr class="w3-red">
+          <th style="width:66%">Akcja</th>
+          <th></th>
+          <th>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(-1)">add</i>
+          </th>
+        </tr>
+        <tr ng-repeat="(k, x) in aq_state.actions">
+          <td>{{ x.name }}</td>
+          <td>
+            <i class="w3-btn w3-right w3-padding-small material-icons w3-text-amber" ng-if="x.on" ng-click="toggleAction(k)">wb_sunny</i>
+            <i class="w3-btn w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" ng-click="toggleAction(k)">wb_sunny</i>
+          </td>
+          <td>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(k)">edit</i>
+          </td>
+        </tr>
+      </table>
+      <table class="sensors w3-table w3-bordered w3-margin-top w3-card-2">
+        <tr class="w3-green">
+          <th style="width:66%">Sensor</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <tr ng-repeat="x in aq_state.sensors">
+          <td>{{ x.name }}</td>
+          <td>
+            <span class="w3-right">{{ x.value | number: 1 }} °C</span>
+          </td>
+          <td>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editSensor($index)">edit</i>
+          </td>
+        </tr>
+      </table>
+      <table class="relays w3-table w3-bordered w3-margin-top w3-card-2">
+        <tr class="w3-blue">
+          <th style="width:66%">Włącznik</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <tr ng-repeat="x in aq_state.relays">
+          <td>{{ x.name }}</td>
+          <td>
+            <i class="w3-right w3-padding-small material-icons w3-text-amber" ng-if="x.on">wb_sunny</i>
+            <i class="w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
+          </td>
+          <td>
+            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelay($index)">edit</i>
+          </td>
+        </tr>
+      </table>
+    </div>
 
-	</div>
+  </div>
 </body>
 
 </html>

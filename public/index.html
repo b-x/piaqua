@@ -8,17 +8,17 @@
   <link rel="icon" type="image/png" href="fish.png">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
   <script src="aquarium.js"></script>
   <style>
-    h3 {margin:4px;font-size:20px}
-    .w3-table td, .w3-table th {padding:2px 8px;vertical-align:middle;height:32px}
+    h3 {margin:4px;font-size:20px;font-family:Verdana,sans-serif;font-weight:700}
+    .w3-table td, .w3-table th {padding:2px 8px;vertical-align:middle;height:37px}
     .w3-margin-top{margin-top:8px!important}
   </style>
 </head>
 
 <body ng-app="aquarium">
-  <div ng-controller="state" style="padding:8px; max-width:500px; margin:auto">
+  <div ng-controller="state" style="padding:8px;max-width:500px;margin:auto">
     <div class="w3-card-2" ng-if="aq_error">
       <div class="w3-container w3-center w3-pale-red" ng-switch="aq_error">
         <h3 ng-switch-when="-1">Akwarium wyłączone!</h3>
@@ -103,8 +103,8 @@
           <th>Start</th>
           <th>Stop</th>
           <th>Dni tygodnia</th>
-          <th>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(-1)">add</i>
+          <th style="width:56px">
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editTask(-1)">add</i>
           </th>
         </tr>
         <tr ng-repeat="(k, x) in aq_state.relays[aq_edit_relay_id].tasks">
@@ -112,7 +112,7 @@
           <td>{{ x.stop | aqDuration }}</td>
           <td>{{ x.weekdays | aqWeekdays }}</td>
           <td>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editTask(k)">edit</i>
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editTask(k)">edit</i>
           </td>
         </tr>
       </table>
@@ -160,10 +160,10 @@
       </div>
       <table class="actions w3-table w3-bordered w3-margin-top w3-card-2">
         <tr class="w3-red">
-          <th style="width:66%">Akcja</th>
+          <th>Akcja</th>
           <th></th>
-          <th>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(-1)">add</i>
+          <th style="width:56px">
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editAction(-1)">add</i>
           </th>
         </tr>
         <tr ng-repeat="(k, x) in aq_state.actions">
@@ -173,15 +173,15 @@
             <i class="w3-btn w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on" ng-click="toggleAction(k)">wb_sunny</i>
           </td>
           <td>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editAction(k)">edit</i>
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editAction(k)">edit</i>
           </td>
         </tr>
       </table>
       <table class="sensors w3-table w3-bordered w3-margin-top w3-card-2">
         <tr class="w3-green">
-          <th style="width:66%">Sensor</th>
+          <th>Sensor</th>
           <th></th>
-          <th></th>
+          <th style="width:56px"></th>
         </tr>
         <tr ng-repeat="x in aq_state.sensors">
           <td>{{ x.name }}</td>
@@ -189,15 +189,15 @@
             <span class="w3-right">{{ x.value | number: 1 }} °C</span>
           </td>
           <td>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editSensor($index)">edit</i>
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editSensor($index)">edit</i>
           </td>
         </tr>
       </table>
       <table class="relays w3-table w3-bordered w3-margin-top w3-card-2">
         <tr class="w3-blue">
-          <th style="width:66%">Włącznik</th>
+          <th>Włącznik</th>
           <th></th>
-          <th></th>
+          <th style="width:56px"></th>
         </tr>
         <tr ng-repeat="x in aq_state.relays">
           <td>{{ x.name }}</td>
@@ -206,7 +206,7 @@
             <i class="w3-right w3-padding-small material-icons w3-text-light-gray" ng-if="!x.on">wb_sunny</i>
           </td>
           <td>
-            <i class="w3-btn w3-right w3-padding-small material-icons" ng-click="editRelay($index)">edit</i>
+            <i class="w3-btn w3-padding-small material-icons" ng-click="editRelay($index)">edit</i>
           </td>
         </tr>
       </table>

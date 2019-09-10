@@ -2,12 +2,14 @@
 set -e
 
 SRC_DIR=$(realpath $(dirname "$0"))
+GOCACHE=$(realpath ~/.cache)
 APP=${SRC_DIR##*/}
 
+# docker pull golang:latest
 docker run --rm \
         -v "$SRC_DIR":/go/src/$APP \
+        -v "$GOCACHE":"/.cache" \
         -w /go/src/$APP \
         -u $(id -u):$(id -g) \
-	-e GOCACHE=off \
         golang:latest \
         ./build $@

@@ -21,6 +21,9 @@ Raspberry Pi aquarium controller
 - momentary push-button switch x3
 
 
+<img src="https://user-images.githubusercontent.com/3099384/64707625-8d844080-d4b3-11e9-9bab-50ca1a92045d.jpg" width="100" title="front view"> <img src="https://user-images.githubusercontent.com/3099384/64708820-82321480-d4b5-11e9-9ce2-64991497a23a.jpg" width="100" title="rear view"> <img src="https://user-images.githubusercontent.com/3099384/64708982-c6251980-d4b5-11e9-8568-0e38db7fcd0f.jpg" width="100" title="inside"> <img src="https://user-images.githubusercontent.com/3099384/64709063-e81e9c00-d4b5-11e9-936f-275a0180e9f8.jpg" width="100" title="inside">
+
+
 ## Installing
 
 Download latest Raspbian Lite from:<br>

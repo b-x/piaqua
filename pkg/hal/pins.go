@@ -70,7 +70,8 @@ func (p *Pins) Loop(quit <-chan struct{}, events chan<- Event) {
 
 func (p *Pins) updateButtonsState(events chan<- Event) {
 	for i, pin := range p.buttons {
-		// EdgeDetected() doesn't work...
+		// don't use EdgeDetected() - requires dtoverlay=gpio-no-irq
+		// and doesn't solve button bouncing problem
 		state := pin.Read()
 		if state == p.buttonsStates[i] {
 			continue

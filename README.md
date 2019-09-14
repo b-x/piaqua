@@ -13,7 +13,7 @@ Raspberry Pi aquarium controller
 ## Hardware
 
 - Raspberry Pi Zero W
-- SD card (2GB or more)
+- SD card (4GB recommended)
 - power supply 2A
 - DS18B20 waterproof x2 (or more) - 1-Wire Digital Temperature Sensor
 - 4,7kΩ resistor for 1-wire sensors
@@ -83,12 +83,14 @@ $ sudo rpi-update
 $ sudo apt update
 $ sudo apt dist-upgrade
 
-# disable bluetooth (if not needed):
+# edit boot options
 $ sudo vi /boot/config.txt
-# append:
+# disable bluetooth (if not needed) - append:
 dtoverlay=disable-bt
 # and disable splash:
 disable_splash=1
+# and disable boot delay
+boot_delay=0
 # and disable audio (if not needed):
 # comment out: dtparam=audio=on
 
@@ -102,6 +104,13 @@ $ sudo systemctl disable dphys-swapfile
 
 # reduce cron tasks
 $ sudo apt purge man-db
+
+# ramdisk mounts
+$ sudo vi /etc/fstab
+# and append:
+tmpfs /tmp tmpfs defaults,noatime,nosuid,size=32m 0 0
+tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=32m 0 0
+tmpfs /var/log tmpfs defaults,noatime,nosuid,size=32m 0 0
 
 # fix wifi disconnection issue
 $ sudo vi /etc/rc.local

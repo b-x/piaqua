@@ -125,17 +125,34 @@ $ sudo reboot
 * create dns name, eg:<br>
 https://www.duckdns.org
 * add cron entry to update IP (follow the site instructions)
-* create NAT rules in your router:
+* setup port forwarding in your router:
 
 service | inner port | outer port | protocol
 ------- | ---------- | ---------- | --------
 web | 8080 | 80 | tcp
 
+WEB interface is accessible under ```http://«dnsname»/```.<br>
+If your router doesn't support NAT loopback (hairpinning),
+then inside LAN the interface is accessible only under
+```http://«ip_address»:8080/```.
+
+
+### Enable easy ssh access (under linux)
+
+```sh
+# append ssh config lines
+$ sudo vim /etc/ssh/ssh_config
+Host piaqua
+    Hostname «ip_address»
+    User pi
+# copy ssh keys to log without password
+$ ssh-copy-id piaqua
+```
 
 ### Create user and group
 
 ```sh
-$ ssh pi@«ip-addr»
+$ ssh piaqua
 $ useradd -m -d /opt/aqua -s /usr/sbin/nologin -U aqua
 $ usermod -a -G gpio aqua
 ```
@@ -145,9 +162,9 @@ $ usermod -a -G gpio aqua
 
 ```sh
 # upload configuration and static www files
-$ scp -r configs public pi@«ip-addr»:/tmp
+$ scp -r configs public piaqua:/tmp
 # login to pi and change owner and rights
-$ ssh pi@«ip-addr»
+$ ssh piaqua
 $ sudo chown -R aqua:aqua /tmp/configs /tmp/public/
 $ sudo chmod 444 /tmp/configs/* /tmp/public/*
 $ sudo mv /tmp/configs /opt/aqua/
@@ -171,9 +188,9 @@ $ sudo vi /opt/aqua/configs/server.yml
 # cross-compile on PC
 $ ./docker-build
 # upload app and configs
-$ scp aqua pi@«ip-addr»:/tmp
+$ scp aqua piaqua:/tmp
 # login to pi and change owner and rights
-$ ssh pi@«ip-addr»
+$ ssh piaqua
 $ sudo chown aqua:aqua /tmp/aqua
 $ sudo chmod 700 /tmp/aqua
 $ sudo mv /tmp/aqua /opt/aqua/
@@ -184,9 +201,9 @@ $ sudo mv /tmp/aqua /opt/aqua/
 
 ```sh
 # upload from repo
-$ scp -P 2222 scripts/aqua.service  pi@rybka.duckdns.org:/tmp
+$ scp scripts/aqua.service  piaqua:/tmp
 # login to pi and setup service
-$ ssh pi@«ip-addr»
+$ ssh piaqua
 $ sudo chown root:root /tmp/aqua.service
 $ sudo mv /tmp/aqua.service /etc/systemd/system
 $ sudo systemctl enable aqua.service

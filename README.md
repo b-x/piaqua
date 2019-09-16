@@ -2,13 +2,11 @@
 
 Raspberry Pi aquarium controller
 
-
 ## Capabilities
 
 - advanced scheduler and manual switches for 6 x 220V outputs (filter, lights, etc.)
 - water and room temperature sensors
 - www server with display / control / setup interface
-
 
 ## Hardware
 
@@ -20,22 +18,20 @@ Raspberry Pi aquarium controller
 - SSR RELAY - OMRON G3MB-202P - 8 channels module (6 channels used)
 - momentary push-button switch x3
 
-
 <img src="https://user-images.githubusercontent.com/3099384/64707625-8d844080-d4b3-11e9-9bab-50ca1a92045d.jpg" width="100" title="front view"> <img src="https://user-images.githubusercontent.com/3099384/64708820-82321480-d4b5-11e9-9ce2-64991497a23a.jpg" width="100" title="rear view"> <img src="https://user-images.githubusercontent.com/3099384/64708982-c6251980-d4b5-11e9-8568-0e38db7fcd0f.jpg" width="100" title="inside"> <img src="https://user-images.githubusercontent.com/3099384/64709063-e81e9c00-d4b5-11e9-936f-275a0180e9f8.jpg" width="100" title="inside">
 
+## Installation
 
-## Installing
-
-Download latest Raspbian Lite from:<br>
-https://www.raspberrypi.org/downloads/raspbian/
+Download latest Raspbian Lite from:\
+<https://www.raspberrypi.org/downloads/raspbian/>
 
 Install image to the SD card
+
 ```sh
 # on linux run `lsblk` to find device file eg. `/dev/sdX`
 $ umount /dev/sdX*
 $ sudo dd bs=4M if=xxx.img of=/dev/sdX status=progress conv=fsync
 ```
-
 
 ### Setup WiFi
 
@@ -43,8 +39,7 @@ $ sudo dd bs=4M if=xxx.img of=/dev/sdX status=progress conv=fsync
 # mount sd-card (reinsert it)
 $ cd /boot
 $ vim wpa_supplicant.conf
-```
-```
+
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
 country=«your_ISO-3166-1_two-letter_country_code»
@@ -54,14 +49,13 @@ network={
     psk="«your_PSK»"
     key_mgmt=WPA-PSK
 }
-```
-```sh
+
+
 # enable ssh access
 $ touch ssh
 
 # unmount and insert sd-card into Raspberry Pi
 ```
-
 
 ### Configure system
 
@@ -122,20 +116,19 @@ $ sudo reboot
 
 ### Enable internet access
 
-* create dns name, eg:<br>
-https://www.duckdns.org
-* add cron entry to update IP (follow the site instructions)
-* setup port forwarding in your router:
+- create dns name, eg:\
+<https://www.duckdns.org>
+- add cron entry to update IP (follow the site instructions)
+- setup port forwarding in your router:
 
 service | inner port | outer port | protocol
 ------- | ---------- | ---------- | --------
 web | 8080 | 80 | tcp
 
-WEB interface is accessible under ```http://«dnsname»/```.<br>
+WEB interface is accessible under ```http://«dnsname»/```.\
 If your router doesn't support NAT loopback (hairpinning),
 then inside LAN the interface is accessible only under
 ```http://«ip_address»:8080/```.
-
 
 ### Enable easy ssh access (under linux)
 
@@ -149,73 +142,39 @@ Host piaqua
 $ ssh-copy-id piaqua
 ```
 
-### Create user and group
+### Build and deploy an application
 
 ```sh
-$ ssh piaqua
-$ useradd -m -d /opt/aqua -s /usr/sbin/nologin -U aqua
-$ usermod -a -G gpio aqua
-```
+# create user etc
+$ scripts/prepare_env.sh
 
+# create systemd service
+$ scripts/deploy_service.sh
 
-### Prepare application files
+# upload configs
+$ scripts/deploy_configs.sh
 
-```sh
-# upload configuration and static www files
-$ scp -r configs public piaqua:/tmp
-# login to pi and change owner and rights
-$ ssh piaqua
-$ sudo chown -R aqua:aqua /tmp/configs /tmp/public/
-$ sudo chmod 444 /tmp/configs/* /tmp/public/*
-$ sudo mv /tmp/configs /opt/aqua/
-$ sudo mv /tmp/public /opt/aqua/
-```
-```sh
-# configure hardware
-# list sensors
-$ ls /sys/bus/w1/devices/
-# and change sensor ids in:
-$ sudo vi /opt/aqua/configs/hardware.yml
-# also adjust pin numbers if wired differently
-# next, change www credentials:
-# (can be more than one user)
-$ sudo vi /opt/aqua/configs/server.yml
-```
+# adjust sensor ids and pin numbers in:
+# /opt/aqua/configs/hardware.yml
 
-### Building and upload an application
+# change web api credentials in:
+# /opt/aqua/configs/server.yml
 
-```sh
-# cross-compile on PC
+# upload www files
+$ scripts/deploy_www.sh
+
+# build an app
 $ ./docker-build
-# upload app and configs
-$ scp aqua piaqua:/tmp
-# login to pi and change owner and rights
-$ ssh piaqua
-$ sudo chown aqua:aqua /tmp/aqua
-$ sudo chmod 700 /tmp/aqua
-$ sudo mv /tmp/aqua /opt/aqua/
+
+# and deploy it
+$ scripts/deploy_app.sh
 ```
-
-
-### Prepare service
-
-```sh
-# upload from repo
-$ scp scripts/aqua.service  piaqua:/tmp
-# login to pi and setup service
-$ ssh piaqua
-$ sudo chown root:root /tmp/aqua.service
-$ sudo mv /tmp/aqua.service /etc/systemd/system
-$ sudo systemctl enable aqua.service
-$ sudo systemctl start aqua
-```
-
 
 ### Debugging
 
 ```sh
 # check service status
-systemctl status aqua
+$ systemctl status aqua
 # view logs
 $ journalctl -u aqua
 ```

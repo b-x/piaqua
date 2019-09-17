@@ -20,7 +20,7 @@ func state(c *controller.Controller) httprouter.Handle {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write(content)
+		_, _ = w.Write(content)
 	}
 }
 
@@ -43,7 +43,7 @@ func addAction(c *controller.Controller) httprouter.Handle {
 		ret, _ := json.Marshal(struct {
 			Id int `json:"id"`
 		}{id})
-		w.Write(ret)
+		_, _ = w.Write(ret)
 	}
 }
 
@@ -168,7 +168,7 @@ func addRelayTask(c *controller.Controller) httprouter.Handle {
 		ret, _ := json.Marshal(struct {
 			Id int `json:"id"`
 		}{id})
-		w.Write(ret)
+		_, _ = w.Write(ret)
 	}
 }
 

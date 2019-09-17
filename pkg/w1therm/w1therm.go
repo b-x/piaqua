@@ -16,7 +16,7 @@ func Temperature(id string) (int, error) {
 	if err != nil {
 		return 0, errRead
 	}
-	if bytes.Index(data, []byte("YES")) < 0 {
+	if !bytes.Contains(data, []byte("YES")) {
 		return 0, errParse
 	}
 	idx := bytes.LastIndex(data, []byte("t="))

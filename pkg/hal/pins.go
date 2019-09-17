@@ -57,12 +57,14 @@ func (p *Pins) Cleanup() {
 }
 
 func (p *Pins) Loop(quit <-chan struct{}, events chan<- Event) {
-	ticker := time.Tick(updateButtonsInterval)
+	ticker := time.NewTicker(updateButtonsInterval)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-quit:
 			return
-		case <-ticker:
+		case <-ticker.C:
 			p.updateButtonsState(events)
 		}
 	}

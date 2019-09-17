@@ -128,12 +128,14 @@ func (c *Controller) saveConfig() {
 }
 
 func (c *Controller) processEvents(quit <-chan struct{}, events <-chan hal.Event) {
-	ticker := time.Tick(updateStateInterval)
+	ticker := time.NewTicker(updateStateInterval)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-quit:
 			return
-		case <-ticker:
+		case <-ticker.C:
 			c.onUpdateState()
 		case event := <-events:
 			switch e := event.(type) {

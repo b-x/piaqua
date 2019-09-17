@@ -18,12 +18,14 @@ func (s *Sensors) Init(hwConf *config.HardwareConf) {
 
 func (s *Sensors) Loop(quit <-chan struct{}, events chan<- Event) {
 	s.readSensors(events) // immediate first read
-	ticker := time.Tick(updateSensorsInterval)
+	ticker := time.NewTicker(updateSensorsInterval)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-quit:
 			return
-		case <-ticker:
+		case <-ticker.C:
 			s.readSensors(events)
 		}
 	}

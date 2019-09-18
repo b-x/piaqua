@@ -1,43 +1,9 @@
 package hal
 
-import (
-	"piaqua/pkg/config"
-	"piaqua/pkg/w1therm"
-	"time"
-)
+import "piaqua/pkg/config"
 
-type Sensors struct {
-	ids []string
-}
+type Sensors interface {
+	EventSource
 
-const updateSensorsInterval = time.Second * 30
-
-func (s *Sensors) Init(hwConf *config.HardwareConf) {
-	s.ids = hwConf.Sensors
-}
-
-func (s *Sensors) Loop(quit <-chan struct{}, events chan<- Event) {
-	s.readSensors(events) // immediate first read
-	ticker := time.NewTicker(updateSensorsInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-quit:
-			return
-		case <-ticker.C:
-			s.readSensors(events)
-		}
-	}
-}
-
-func (s *Sensors) readSensors(events chan<- Event) {
-	for n, id := range s.ids {
-		temp, err := w1therm.Temperature(id)
-		if err != nil {
-			events <- TemperatureError{n, err}
-			continue
-		}
-		events <- TemperatureRead{n, temp}
-	}
+	Init(hwConf *config.HardwareConf) error
 }

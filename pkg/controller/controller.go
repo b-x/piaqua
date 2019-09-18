@@ -27,8 +27,11 @@ type Controller struct {
 const updateStateInterval = time.Second
 
 // NewController creates and runs a controller
-func NewController(configDir string) (*Controller, error) {
+func NewController(configDir string, sensors hal.Sensors, pins hal.Pins) (*Controller, error) {
 	c := &Controller{configDir: configDir}
+	c.pins = pins
+	c.sensors = sensors
+
 	err := c.hwConf.Read(configDir)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read hw config from %s: %s", configDir, err.Error())
@@ -53,7 +56,11 @@ func NewController(configDir string) (*Controller, error) {
 
 	c.stop = make(chan struct{})
 	c.events = make(chan hal.Event, 16)
-	c.sensors.Init(&c.hwConf)
+
+	err = c.sensors.Init(&c.hwConf)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't init sensors: %s", err.Error())
+	}
 
 	err = c.pins.Init(&c.hwConf)
 	if err != nil {
@@ -62,7 +69,7 @@ func NewController(configDir string) (*Controller, error) {
 
 	c.init()
 
-	eventSources := []hal.EventSource{&c.sensors, &c.pins}
+	eventSources := []hal.EventSource{c.sensors, c.pins}
 
 	c.allDone.Add(len(eventSources) + 1)
 

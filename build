@@ -2,11 +2,9 @@
 set -ex
 
 go version
-gofmt -w .
 go get -d ./...
 go test ./...
 
 # raspberry pi zero is armv6
-for CMD in `ls ./cmd`; do
-	GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-w -s" "./cmd/$CMD"
-done
+GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-w -s" "./cmd/aqua"
+go build "./cmd/mock"

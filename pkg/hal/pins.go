@@ -1,98 +1,13 @@
 package hal
 
-import (
-	"piaqua/pkg/config"
-	"time"
+import "piaqua/pkg/config"
 
-	"github.com/stianeikeland/go-rpio"
-)
+type Pins interface {
+	EventSource
 
-type Pins struct {
-	buttons []rpio.Pin
-	relays  []rpio.Pin
+	Init(hwConf *config.HardwareConf) error
+	Cleanup()
 
-	buttonsStates []rpio.State
-}
-
-const updateButtonsInterval = time.Millisecond * 100
-
-func (p *Pins) Init(hwConf *config.HardwareConf) error {
-	err := rpio.Open()
-	if err != nil {
-		return err
-	}
-
-	p.buttons = make([]rpio.Pin, len(hwConf.Buttons))
-	p.relays = make([]rpio.Pin, len(hwConf.Relays))
-	p.buttonsStates = make([]rpio.State, len(hwConf.Buttons))
-
-	for i := range hwConf.Buttons {
-		p.buttons[i] = rpio.Pin(hwConf.Buttons[i])
-	}
-	for i := range hwConf.Relays {
-		p.relays[i] = rpio.Pin(hwConf.Relays[i])
-	}
-	for i := range p.buttonsStates {
-		p.buttonsStates[i] = rpio.High
-	}
-	for _, pin := range p.buttons {
-		pin.Input()
-		pin.PullUp()
-	}
-	for _, pin := range p.relays {
-		pin.Output()
-		//pin.Write(rpio.Low)
-	}
-	return nil
-}
-
-func (p *Pins) Cleanup() {
-	for _, pin := range p.buttons {
-		pin.PullOff()
-	}
-	for _, pin := range p.relays {
-		pin.Write(rpio.Low)
-	}
-	rpio.Close()
-}
-
-func (p *Pins) Loop(quit <-chan struct{}, events chan<- Event) {
-	ticker := time.NewTicker(updateButtonsInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-quit:
-			return
-		case <-ticker.C:
-			p.updateButtonsState(events)
-		}
-	}
-}
-
-func (p *Pins) updateButtonsState(events chan<- Event) {
-	for i, pin := range p.buttons {
-		// don't use EdgeDetected() - requires dtoverlay=gpio-no-irq
-		// and doesn't solve button bouncing problem
-		state := pin.Read()
-		if state == p.buttonsStates[i] {
-			continue
-		}
-		p.buttonsStates[i] = state
-		if state == rpio.Low {
-			events <- ButtonPressed{i}
-		}
-	}
-}
-
-func (p *Pins) GetRelay(id int) bool {
-	return p.relays[id].Read() != rpio.Low
-}
-
-func (p *Pins) SetRelay(id int, on bool) {
-	state := rpio.Low
-	if on {
-		state = rpio.High
-	}
-	p.relays[id].Write(state)
+	GetRelay(id int) bool
+	SetRelay(id int, on bool)
 }
